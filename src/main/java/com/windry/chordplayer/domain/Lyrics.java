@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,7 +23,7 @@ public class Lyrics extends BaseEntity {
     private Song song;
 
     @OneToMany(mappedBy = "lyrics", cascade = CascadeType.ALL)
-    private List<Chords> chords;
+    private List<Chords> chords = new ArrayList<>();
 
     private String lyrics;
 
@@ -38,4 +39,10 @@ public class Lyrics extends BaseEntity {
         this.line = line;
         this.tag = tag;
     }
+
+    public void changeSong(Song song){
+        this.song = song;
+        song.getLyricsList().add(this);
+    }
+
 }
