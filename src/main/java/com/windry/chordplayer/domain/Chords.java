@@ -28,8 +28,12 @@ public class Chords extends BaseEntity {
         this.chord = chord;
     }
 
-    public void changeKey(int amount){
-        this.chord = this.chord.replace(this.chord, ChordUtil.notes.get(ChordUtil.notes.indexOf(this.chord) + amount));
+    public void changeKey(int amount) {
+        this.chord = this.chord.replace(this.chord, ChordUtil.sharpNotes.get(ChordUtil.sharpNotes.indexOf(this.chord) + amount));
+    }
 
+    public void changeLyrics(Lyrics lyrics) {
+        this.lyrics = lyrics;
+        lyrics.getChords().add(this);
     }
 }
