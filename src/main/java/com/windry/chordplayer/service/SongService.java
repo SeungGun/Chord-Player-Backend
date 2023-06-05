@@ -5,16 +5,20 @@ import com.windry.chordplayer.domain.Lyrics;
 import com.windry.chordplayer.domain.Song;
 import com.windry.chordplayer.domain.Tag;
 import com.windry.chordplayer.dto.CreateSongDto;
+import com.windry.chordplayer.dto.FiltersOfSongList;
 import com.windry.chordplayer.dto.LyricsDto;
+import com.windry.chordplayer.dto.SongListItemDto;
 import com.windry.chordplayer.exception.DuplicateTitleAndArtistException;
 import com.windry.chordplayer.exception.InvalidInputException;
 import com.windry.chordplayer.repository.ChordsRepository;
 import com.windry.chordplayer.repository.LyricsRepository;
 import com.windry.chordplayer.repository.SongRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -53,13 +57,16 @@ public class SongService {
                         .builder()
                         .chord(chord)
                         .build();
-                chords.changeLyrics(lyrics);
-                chordsRepository.save(chords);
+                lyrics.addChords(chords);
             }
-            lyrics.changeSong(song);
-            lyricsRepository.save(lyrics);
+            song.addLyrics(lyrics);
         }
         return songRepository.save(song).getId();
+    }
+
+    public List<SongListItemDto> getAllSongs(FiltersOfSongList filtersOfSongList, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return songRepository.searchAllSong(filtersOfSongList, pageRequest);
     }
 
     public void validateDupSongAndArtist(String title, String artist) {
@@ -67,7 +74,7 @@ public class SongService {
             throw new InvalidInputException();
 
         // 공백 무시하고 검색 가능
-        Optional<Song> song = songRepository.findSongByTitleAndArtist(title.trim(), artist.trim());
+        Optional<Song> song = songRepository.findSongByTitleAndArtist(title.replace(" ", ""), artist.replace(" ", ""));
         if (song.isPresent())
             throw new DuplicateTitleAndArtistException();
     }
