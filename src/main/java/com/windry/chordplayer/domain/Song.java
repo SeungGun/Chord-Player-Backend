@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,9 @@ public class Song extends BaseEntity {
 
     private String modulation;
 
+    @ColumnDefault("0")
+    private int viewCount;
+
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
     private List<Lyrics> lyricsList = new ArrayList<>();
 
@@ -63,4 +67,8 @@ public class Song extends BaseEntity {
         this.lyricsList = lyrics;
     }
 
+    public void addLyrics(Lyrics lyrics){
+        lyricsList.add(lyrics);
+        lyrics.changeSong(this);
+    }
 }
