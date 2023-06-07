@@ -44,17 +44,20 @@ public class Song extends BaseEntity {
     @ColumnDefault("0")
     private int viewCount;
 
+    private String note;
+
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
     private List<Lyrics> lyricsList = new ArrayList<>();
 
     @Builder
-    public Song(String title, String artist, String originalKey, Gender gender, Integer bpm, String modulation) {
+    public Song(String title, String artist, String originalKey, Gender gender, Integer bpm, String modulation, String note) {
         this.title = title;
         this.artist = artist;
         this.originalKey = originalKey;
         this.gender = gender;
         this.bpm = bpm;
         this.modulation = modulation;
+        this.note = note;
     }
 
     public void changeRequestFields(String title, String artist, String originalKey, Gender gender, Integer bpm, String modulation, List<Lyrics> lyrics) {
@@ -67,7 +70,7 @@ public class Song extends BaseEntity {
         this.lyricsList = lyrics;
     }
 
-    public void addLyrics(Lyrics lyrics){
+    public void addLyrics(Lyrics lyrics) {
         lyricsList.add(lyrics);
         lyrics.changeSong(this);
     }

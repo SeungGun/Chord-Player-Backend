@@ -41,6 +41,7 @@ public class SongService {
                 .gender(createSongDto.getGender())
                 .originalKey(createSongDto.getOriginalKey())
                 .modulation(createSongDto.getModulation())
+                .note(createSongDto.getNote())
                 .bpm(createSongDto.getBpm())
                 .build();
 
