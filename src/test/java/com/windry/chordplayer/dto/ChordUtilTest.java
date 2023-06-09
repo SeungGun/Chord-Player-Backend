@@ -16,6 +16,7 @@ class ChordUtilTest {
         String s6 = ChordUtil.changeKey("B7/A", -4);
         String s7 = ChordUtil.changeKey("AbM7", 1);
         String s8 = ChordUtil.changeKey("Fmaj7", 3);
+        String s9 = ChordUtil.changeKey("C#m7", -4);
 
         assertEquals("Am/C#", s1);
         assertEquals("Asus4/C#", s2);
@@ -25,5 +26,6 @@ class ChordUtilTest {
         assertEquals("G7/F", s6);
         assertEquals("AM7", s7);
         assertEquals("G#maj7", s8);
+        assertEquals("Am7", s9);
     }
 }
