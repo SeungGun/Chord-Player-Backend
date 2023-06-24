@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,7 @@ public class Lyrics extends BaseEntity {
     private Song song;
 
     @OneToMany(mappedBy = "lyrics", cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Chords> chords = new ArrayList<>();
 
     private String lyrics;

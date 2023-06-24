@@ -1,6 +1,5 @@
 package com.windry.chordplayer.domain;
 
-import com.windry.chordplayer.dto.ChordUtil;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,10 +25,6 @@ public class Chords extends BaseEntity {
     @Builder
     public Chords(String chord) {
         this.chord = chord;
-    }
-
-    public void changeKey(int amount) {
-        this.chord = this.chord.replace(this.chord, ChordUtil.sharpNotes.get(ChordUtil.sharpNotes.indexOf(this.chord) + amount));
     }
 
     public void changeLyrics(Lyrics lyrics) {

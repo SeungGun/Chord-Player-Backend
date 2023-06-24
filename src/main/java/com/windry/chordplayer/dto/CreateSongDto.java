@@ -20,10 +20,10 @@ public class CreateSongDto {
     private String modulation;
     private String note;
     private List<LyricsDto> contents = new ArrayList<>();
-
+    private List<String> genres = new ArrayList<>();
 
     @Builder
-    public CreateSongDto(String title, String artist, String originalKey, Gender gender, int bpm, String modulation, String note, List<LyricsDto> contents) {
+    public CreateSongDto(String title, String artist, String originalKey, Gender gender, int bpm, String modulation, String note, List<LyricsDto> contents, List<String> genres) {
         this.title = title;
         this.artist = artist;
         this.originalKey = originalKey;
@@ -32,5 +32,6 @@ public class CreateSongDto {
         this.modulation = modulation;
         this.note = note;
         this.contents = contents;
+        this.genres = genres;
     }
 }
