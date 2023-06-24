@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface SongRepository extends JpaRepository<Song, Long> {
+public interface SongRepository extends JpaRepository<Song, Long>, SongRepositoryCustom {
 
     @Query("select s from Song s where replace(s.title, ' ', '') = :title and replace(s.artist, ' ', '') = :artist ")
     Optional<Song> findSongByTitleAndArtist(@Param("title") String title, @Param("artist") String artist);

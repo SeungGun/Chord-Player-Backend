@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,11 @@ public class Song extends BaseEntity {
     private String note;
 
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<SongGenre> songGenres = new ArrayList<>();
+
+    @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Lyrics> lyricsList = new ArrayList<>();
 
     @Builder
@@ -73,5 +80,9 @@ public class Song extends BaseEntity {
     public void addLyrics(Lyrics lyrics) {
         lyricsList.add(lyrics);
         lyrics.changeSong(this);
+    }
+
+    public void addGenre(SongGenre songGenre) {
+        songGenres.add(songGenre);
     }
 }

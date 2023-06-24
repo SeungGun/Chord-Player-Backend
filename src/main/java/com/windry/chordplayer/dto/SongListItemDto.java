@@ -5,33 +5,31 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class CreateSongDto {
-
+public class SongListItemDto {
+    private Long songId;
     private String title;
     private String artist;
     private String originalKey;
-    private Gender gender;
     private int bpm;
     private String modulation;
     private String note;
-    private List<LyricsDto> contents = new ArrayList<>();
-    private List<String> genres = new ArrayList<>();
+    private Gender gender;
+    private List<String> genres;
 
     @Builder
-    public CreateSongDto(String title, String artist, String originalKey, Gender gender, int bpm, String modulation, String note, List<LyricsDto> contents, List<String> genres) {
+    public SongListItemDto(Long songId, String title, String artist, String originalKey, int bpm, String modulation, String note, Gender gender, List<String> genres) {
+        this.songId = songId;
         this.title = title;
         this.artist = artist;
         this.originalKey = originalKey;
-        this.gender = gender;
         this.bpm = bpm;
         this.modulation = modulation;
         this.note = note;
-        this.contents = contents;
+        this.gender = gender;
         this.genres = genres;
     }
 }

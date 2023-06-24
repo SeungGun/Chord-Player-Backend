@@ -1,9 +1,6 @@
 package com.windry.chordplayer.service;
 
-import com.windry.chordplayer.domain.Chords;
-import com.windry.chordplayer.domain.Lyrics;
-import com.windry.chordplayer.domain.Song;
-import com.windry.chordplayer.domain.Tag;
+import com.windry.chordplayer.domain.*;
 import com.windry.chordplayer.dto.CreateSongDto;
 import com.windry.chordplayer.dto.FiltersOfSongList;
 import com.windry.chordplayer.dto.LyricsDto;
@@ -11,6 +8,7 @@ import com.windry.chordplayer.dto.SongListItemDto;
 import com.windry.chordplayer.exception.DuplicateTitleAndArtistException;
 import com.windry.chordplayer.exception.InvalidInputException;
 import com.windry.chordplayer.repository.ChordsRepository;
+import com.windry.chordplayer.repository.GenreRepository;
 import com.windry.chordplayer.repository.LyricsRepository;
 import com.windry.chordplayer.repository.SongRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +27,7 @@ public class SongService {
     private final SongRepository songRepository;
     private final LyricsRepository lyricsRepository;
     private final ChordsRepository chordsRepository;
+    private final GenreRepository genreRepository;
 
     @Transactional
     public Long createNewSong(CreateSongDto createSongDto) {
@@ -45,6 +44,13 @@ public class SongService {
                 .bpm(createSongDto.getBpm())
                 .build();
 
+        for(int i = 0; i< createSongDto.getGenres().size(); ++i){
+            Genre genre = genreRepository.findGenreByName(createSongDto.getGenres().get(i));
+            SongGenre songGenre = SongGenre.builder()
+                    .genre(genre)
+                    .song(song).build();
+            song.addGenre(songGenre);
+        }
         for (int i = 0; i < createSongDto.getContents().size(); i++) {
             LyricsDto lyricsDto = createSongDto.getContents().get(i);
             Lyrics lyrics = Lyrics.builder()
