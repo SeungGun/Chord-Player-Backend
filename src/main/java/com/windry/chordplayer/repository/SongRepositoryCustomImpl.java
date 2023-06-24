@@ -7,6 +7,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.windry.chordplayer.domain.*;
 import com.windry.chordplayer.dto.FiltersOfSongList;
 import com.windry.chordplayer.dto.SongListItemDto;
+import com.windry.chordplayer.spec.Gender;
+import com.windry.chordplayer.spec.SearchCriteria;
+import com.windry.chordplayer.spec.SortStrategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 

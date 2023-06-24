@@ -1,8 +1,8 @@
 package com.windry.chordplayer.dto;
 
-import com.windry.chordplayer.domain.Gender;
-import com.windry.chordplayer.domain.SearchCriteria;
-import com.windry.chordplayer.domain.SortStrategy;
+import com.windry.chordplayer.spec.Gender;
+import com.windry.chordplayer.spec.SearchCriteria;
+import com.windry.chordplayer.spec.SortStrategy;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

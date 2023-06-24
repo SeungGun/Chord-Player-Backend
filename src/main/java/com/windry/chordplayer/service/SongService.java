@@ -11,6 +11,7 @@ import com.windry.chordplayer.repository.ChordsRepository;
 import com.windry.chordplayer.repository.GenreRepository;
 import com.windry.chordplayer.repository.LyricsRepository;
 import com.windry.chordplayer.repository.SongRepository;
+import com.windry.chordplayer.spec.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -44,12 +45,14 @@ public class SongService {
                 .bpm(createSongDto.getBpm())
                 .build();
 
-        for(int i = 0; i< createSongDto.getGenres().size(); ++i){
-            Genre genre = genreRepository.findGenreByName(createSongDto.getGenres().get(i));
-            SongGenre songGenre = SongGenre.builder()
-                    .genre(genre)
-                    .song(song).build();
-            song.addGenre(songGenre);
+        for (int i = 0; i < createSongDto.getGenres().size(); ++i) {
+            Optional<Genre> genreOptional = genreRepository.findGenreByName(createSongDto.getGenres().get(i));
+            if (genreOptional.isPresent()) {
+                SongGenre songGenre = SongGenre.builder()
+                        .genre(genreOptional.get())
+                        .song(song).build();
+                song.addGenre(songGenre);
+            }
         }
         for (int i = 0; i < createSongDto.getContents().size(); i++) {
             LyricsDto lyricsDto = createSongDto.getContents().get(i);

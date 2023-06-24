@@ -1,6 +1,6 @@
 package com.windry.chordplayer.service;
 
-import com.windry.chordplayer.domain.Gender;
+import com.windry.chordplayer.spec.Gender;
 import com.windry.chordplayer.domain.Genre;
 import com.windry.chordplayer.domain.Song;
 import com.windry.chordplayer.domain.SongGenre;
