@@ -1,6 +1,6 @@
 package com.windry.chordplayer.dto;
 
-import com.windry.chordplayer.domain.Gender;
+import com.windry.chordplayer.spec.Gender;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

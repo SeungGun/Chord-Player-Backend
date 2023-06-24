@@ -1,5 +1,6 @@
 package com.windry.chordplayer.domain;
 
+import com.windry.chordplayer.spec.Gender;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

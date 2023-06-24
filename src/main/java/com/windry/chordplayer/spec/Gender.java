@@ -1,4 +1,4 @@
-package com.windry.chordplayer.domain;
+package com.windry.chordplayer.spec;
 
 public enum Gender {
     MALE,
