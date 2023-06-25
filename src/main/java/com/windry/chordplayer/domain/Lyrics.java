@@ -54,4 +54,7 @@ public class Lyrics extends BaseEntity {
         chord.changeLyrics(this);
     }
 
+    public List<String> convertStringChords(List<Chords> chords){
+        return chords.stream().map(Chords::getChord).toList();
+    }
 }
