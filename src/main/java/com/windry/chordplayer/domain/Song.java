@@ -86,4 +86,8 @@ public class Song extends BaseEntity {
     public void addGenre(SongGenre songGenre) {
         songGenres.add(songGenre);
     }
+
+    public void updateViewCount(){
+        this.viewCount++;
+    }
 }
