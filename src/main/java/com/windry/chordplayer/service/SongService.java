@@ -3,6 +3,7 @@ package com.windry.chordplayer.service;
 import com.windry.chordplayer.domain.*;
 import com.windry.chordplayer.dto.*;
 import com.windry.chordplayer.exception.DuplicateTitleAndArtistException;
+import com.windry.chordplayer.exception.ImpossibleConvertGenderException;
 import com.windry.chordplayer.exception.InvalidInputException;
 import com.windry.chordplayer.exception.NoSuchDataException;
 import com.windry.chordplayer.repository.ChordsRepository;
@@ -124,6 +125,8 @@ public class SongService {
                     currentGender = Gender.MALE;
                 }
                 cumulateKey += amount;
+            } else {
+                throw new ImpossibleConvertGenderException();
             }
         }
 
