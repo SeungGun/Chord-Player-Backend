@@ -1,5 +1,8 @@
 package com.windry.chordplayer.service;
 
+import com.windry.chordplayer.dto.DetailSongDto;
+import com.windry.chordplayer.dto.FiltersOfDetailSong;
+import com.windry.chordplayer.exception.ImpossibleConvertGenderException;
 import com.windry.chordplayer.spec.Gender;
 import com.windry.chordplayer.domain.Genre;
 import com.windry.chordplayer.domain.Song;
@@ -11,12 +14,12 @@ import com.windry.chordplayer.repository.ChordsRepository;
 import com.windry.chordplayer.repository.GenreRepository;
 import com.windry.chordplayer.repository.LyricsRepository;
 import com.windry.chordplayer.repository.SongRepository;
+import com.windry.chordplayer.spec.Tuning;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -93,7 +96,6 @@ class SongServiceTest {
 
     @DisplayName("4박자 마디의 가사와 코드가 포함된 새로운 노래 데이터를 생성한다.")
     @Test
-    @Rollback(value = false)
     void createNewSong() {
         // given
         Genre genre = Genre.builder().name("락").build();
@@ -151,5 +153,174 @@ class SongServiceTest {
                 .usingRecursiveComparison()
                 .ignoringFields("createdDate", "modifiedDate", "id", "lyricsList", "songGenres")
                 .isEqualTo(song1);
+    }
+
+    @Test
+    @DisplayName("상세 노래 정보에서 키 변경에 대한 여러가지 필터를 적용해본다.")
+    void changeKeyOfDetailSong() {
+        // given
+        Genre genre = Genre.builder().name("발라드").build();
+        genreRepository.save(genre);
+
+        List<String> genreList = new ArrayList<>();
+        genreList.add("발라드");
+
+        CreateSongDto songDto = CreateSongDto.builder()
+                .title("다정히 내 이름을 부르면")
+                .artist("경서예지")
+                .originalKey("Db")
+                .bpm(72)
+                .gender(Gender.MIXED)
+                .modulation("Db-Eb-F-G")
+                .contents(null)
+                .genres(genreList)
+                .build();
+
+        List<LyricsDto> lyricsDtoList = new ArrayList<>();
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("Db", "Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("Bbm7", "Fm7"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("Gb", "Gbm6"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("끝 없")
+                .chords(LyricsDto.getAllChords("Db", "Dbsus4", "Db"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("이 별빛이 내리던 밤")
+                .chords(LyricsDto.getAllChords("Db", "Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("기분 좋은 바람이")
+                .chords(LyricsDto.getAllChords("Bbm7", "Db/Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("두 뺨을 스치고")
+                .chords(LyricsDto.getAllChords("Gb", "Db/F"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("새벽 바다 한 곳을 보")
+                .chords(LyricsDto.getAllChords("Ebm", "Gb/Ab", "Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("는 아름다운 너와 나")
+                .chords(LyricsDto.getAllChords("Db", "Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("그림을 그려갔어")
+                .chords(LyricsDto.getAllChords("Bbm", "Bbm7/Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("모래 위 떨린 손")
+                .chords(LyricsDto.getAllChords("Gbm", "Gbm6"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("끝으로 날 향")
+                .chords(LyricsDto.getAllChords("Db", "Fm/C"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("해 웃어주는 입술")
+                .chords(LyricsDto.getAllChords("Bbm", "BbmM7/A"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("사랑스러운 두눈을 가진 네")
+                .chords(LyricsDto.getAllChords("Ebm", "Db/F", "Gb", "Eb7/G"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("MODULATION")
+                .lyrics("가 다정히 내 이름을")
+                .chords(LyricsDto.getAllChords("Ab", "Bb"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("부르면 내 마음이")
+                .chords(LyricsDto.getAllChords("Eb", "Bb"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("녹아내려 언제나")
+                .chords(LyricsDto.getAllChords("Cm", "Cm7/Bb"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("나 하날 위해 준비된")
+                .chords(LyricsDto.getAllChords("Ab", "Eb/G"))
+                .build());
+
+        songDto.setContents(lyricsDtoList);
+
+        // when
+        Long newSong = songService.createNewSong(songDto);
+
+        FiltersOfDetailSong filters = FiltersOfDetailSong.builder()
+                .key(null)
+                .isKeyUp(null)
+                .convertGender(null)
+                .tuning(null)
+                .capo(1)
+                .build();
+
+        FiltersOfDetailSong filters2 = FiltersOfDetailSong.builder()
+                .key(3)
+                .isKeyUp(true)
+                .convertGender(null)
+                .tuning(null)
+                .capo(1)
+                .build();
+
+        FiltersOfDetailSong filters3 = FiltersOfDetailSong.builder()
+                .key(null)
+                .isKeyUp(null)
+                .convertGender(true)
+                .tuning(null)
+                .capo(null)
+                .build();
+
+        FiltersOfDetailSong filters4 = FiltersOfDetailSong.builder()
+                .key(null)
+                .isKeyUp(null)
+                .convertGender(null)
+                .tuning(Tuning.HALF_STEP)
+                .capo(null)
+                .build();
+
+        DetailSongDto detailSong = songService.getDetailSong(1L, 0L, 10L, filters, "Db");
+        DetailSongDto detailSong2 = songService.getDetailSong(1L, 0L, 20L, filters, "Db");
+        DetailSongDto detailSong3 = songService.getDetailSong(1L, 0L, 20L, filters2, "Db");
+        DetailSongDto detailSong5 = songService.getDetailSong(1L, 0L, 10L, filters4, "Db");
+
+        // then
+        Assertions.assertEquals(10, detailSong.getContents().size());
+        Assertions.assertEquals("C", detailSong.getCurrentKey());
+        Assertions.assertEquals("D", detailSong2.getCurrentKey());
+        Assertions.assertEquals("F", detailSong3.getCurrentKey());
+        Assertions.assertEquals("C", detailSong5.getCurrentKey());
+
+        Assertions.assertThrows(ImpossibleConvertGenderException.class, () -> songService.getDetailSong(1L, 0L, 10L, filters3, "Db"));
+
+        Assertions.assertEquals("C", detailSong.getContents().get(0).getChords().get(0));
+        Assertions.assertEquals("G", detailSong.getContents().get(0).getChords().get(1));
+        Assertions.assertEquals("Am7", detailSong.getContents().get(1).getChords().get(0));
     }
 }
