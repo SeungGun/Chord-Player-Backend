@@ -1,4 +1,4 @@
-package com.windry.chordplayer.dto;
+package com.windry.chordplayer.util;
 
 import com.windry.chordplayer.exception.NotFoundChordException;
 
