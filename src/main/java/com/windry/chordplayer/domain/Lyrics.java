@@ -46,7 +46,6 @@ public class Lyrics extends BaseEntity {
 
     public void changeSong(Song song){
         this.song = song;
-        song.getLyricsList().add(this);
     }
 
     public void addChords(Chords chord){
