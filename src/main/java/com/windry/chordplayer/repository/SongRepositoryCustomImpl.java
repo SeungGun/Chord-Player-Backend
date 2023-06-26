@@ -11,11 +11,12 @@ import com.windry.chordplayer.spec.Gender;
 import com.windry.chordplayer.spec.SearchCriteria;
 import com.windry.chordplayer.spec.SortStrategy;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
+import static com.windry.chordplayer.domain.QGenre.genre;
 import static com.windry.chordplayer.domain.QSong.song;
+import static com.windry.chordplayer.domain.QSongGenre.songGenre;
 
 @RequiredArgsConstructor
 public class SongRepositoryCustomImpl implements SongRepositoryCustom {
@@ -23,18 +24,20 @@ public class SongRepositoryCustomImpl implements SongRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<SongListItemDto> searchAllSong(FiltersOfSongList filtersOfSongList, Pageable pageable) {
+    public List<SongListItemDto> searchAllSong(FiltersOfSongList filtersOfSongList, Long page, Long size, Song cursorSong) {
         List<Song> result = queryFactory
                 .selectFrom(song)
+                .join(song.songGenres, songGenre).fetchJoin()
+                .join(songGenre.genre, genre).fetchJoin()
                 .where(
                         searchByCriteria(filtersOfSongList.getSearchCriteria(),
                                 filtersOfSongList.getSearchKeyword()),
                         searchByGender(filtersOfSongList.getGender()),
                         searchByKey(filtersOfSongList.getSearchKey()),
-                        searchByGenre(filtersOfSongList.getSearchGenre())
+                        searchByGenre(filtersOfSongList.getSearchGenre()),
+                        pagination(cursorSong, filtersOfSongList.getSortStrategy())
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .limit(size)
                 .orderBy(sortByStrategy(filtersOfSongList.getSortStrategy()))
                 .fetch();
         return result.stream().map(r -> {
@@ -139,5 +142,24 @@ public class SongRepositoryCustomImpl implements SongRepositoryCustom {
             }
         }
         return null;
+    }
+
+    /**
+     * 페이지네이션 적용
+     *
+     * @param cursor       기준이 되는 시작 Song 데이터
+     * @param sortStrategy 정렬 전략
+     * @return 정렬 전략에 따른 현재 기준 데이터 다음의 데이터
+     */
+    private Predicate pagination(Song cursor, SortStrategy sortStrategy) {
+        if (cursor == null || sortStrategy == null)
+            return null;
+
+        switch (sortStrategy) {
+            case NAME -> song.title.loe(cursor.getTitle());
+            case VIEW -> song.viewCount.loe(cursor.getViewCount());
+            case CHRONOLOGICAL -> song.id.lt(cursor.getId());
+        }
+        return song.id.lt(cursor.getId());
     }
 }
