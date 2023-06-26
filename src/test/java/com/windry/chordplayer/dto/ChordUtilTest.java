@@ -1,5 +1,6 @@
 package com.windry.chordplayer.dto;
 
+import com.windry.chordplayer.util.ChordUtil;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

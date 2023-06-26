@@ -29,6 +29,5 @@ public class Chords extends BaseEntity {
 
     public void changeLyrics(Lyrics lyrics) {
         this.lyrics = lyrics;
-        lyrics.getChords().add(this);
     }
 }
