@@ -1,13 +1,12 @@
 package com.windry.chordplayer.api;
 
+import com.windry.chordplayer.dto.*;
 import com.windry.chordplayer.spec.Gender;
 import com.windry.chordplayer.spec.SearchCriteria;
 import com.windry.chordplayer.spec.SortStrategy;
-import com.windry.chordplayer.dto.CreateSongDto;
-import com.windry.chordplayer.dto.FiltersOfSongList;
-import com.windry.chordplayer.dto.SongListItemDto;
 import com.windry.chordplayer.exception.InvalidInputException;
 import com.windry.chordplayer.service.SongService;
+import com.windry.chordplayer.spec.Tuning;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,8 +33,8 @@ public class SongAPI {
 
     @GetMapping("")
     public ResponseEntity<List<SongListItemDto>> getSongList(
-            @RequestParam("page") Integer page,
-            @RequestParam("size") Integer size,
+            @RequestParam("page") Long page,
+            @RequestParam("size") Long size,
             @RequestParam(value = "searchCriteria", required = false) SearchCriteria searchCriteria,
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "gender", required = false) Gender gender,
@@ -60,20 +59,40 @@ public class SongAPI {
 
         return ResponseEntity.ok().body(allSongs);
     }
-//
-//    @GetMapping("/{songId}")
-//    public ResponseEntity<Void> getFilteredSong(
-//            @PathVariable("songId") Long songId,
-//            @RequestParam(value = "capo", required = false) int capo,
-//            @RequestParam(value = "tuning", required = false)Tuning tuning,
-//            @RequestParam(value = "gender", required = false) Boolean convertGender,
-//            @RequestParam(value = "key-up", required = false) Boolean isKeyUp,
-//            @RequestParam(value = "key",required = false) int key,
-//            @RequestParam("offset") int offset,
-//            @RequestParam("size") int size
-//            ){
-//
-//    }
+
+    @GetMapping("/{songId}")
+    public ResponseEntity<DetailSongDto> getFilteredSong(
+            @PathVariable("songId") Long songId,
+            @RequestParam(value = "capo", required = false) Integer capo,
+            @RequestParam(value = "tuning", required = false) Tuning tuning,
+            @RequestParam(value = "gender", required = false) Boolean convertGender,
+            @RequestParam(value = "key-up", required = false) Boolean isKeyUp,
+            @RequestParam(value = "key", required = false) Integer key,
+            @RequestParam(value = "currentKey") String currentKey,
+            @RequestParam("offset") Long offset, // line 에 대한 offset
+            @RequestParam("size") Long size
+    ) {
+
+        if (songId == null)
+            throw new InvalidInputException();
+
+        if (offset == null || size == null)
+            throw new InvalidInputException();
+
+        if(currentKey == null)
+            throw new InvalidInputException();
+
+        FiltersOfDetailSong filters = FiltersOfDetailSong.builder()
+                .capo(capo)
+                .tuning(tuning)
+                .convertGender(convertGender)
+                .isKeyUp(isKeyUp)
+                .key(key)
+                .build();
+
+        DetailSongDto detailSong = songService.getDetailSong(songId, offset, size, filters, currentKey);
+        return ResponseEntity.ok().body(detailSong);
+    }
 //
 //    @PutMapping("/{songId}")
 //    public ResponseEntity<Void> modifySong(){
