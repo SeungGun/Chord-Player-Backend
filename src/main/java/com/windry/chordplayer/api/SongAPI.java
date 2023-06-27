@@ -79,7 +79,7 @@ public class SongAPI {
         if (offset == null || size == null)
             throw new InvalidInputException();
 
-        if(currentKey == null)
+        if (currentKey == null)
             throw new InvalidInputException();
 
         FiltersOfDetailSong filters = FiltersOfDetailSong.builder()
@@ -93,12 +93,16 @@ public class SongAPI {
         DetailSongDto detailSong = songService.getDetailSong(songId, offset, size, filters, currentKey);
         return ResponseEntity.ok().body(detailSong);
     }
-//
-//    @PutMapping("/{songId}")
-//    public ResponseEntity<Void> modifySong(){
-//
-//    }
-//
+
+    @PutMapping("/{songId}")
+    public ResponseEntity<Void> modifySong(
+            @PathVariable("songId") Long songId,
+            @RequestBody CreateSongDto createSongDto
+    ) {
+        songService.modifySong(songId, createSongDto);
+        return ResponseEntity.ok().build();
+    }
+
 //    @DeleteMapping("/{songId}")
 //    public ResponseEntity<Void> deleteSong(){
 //
