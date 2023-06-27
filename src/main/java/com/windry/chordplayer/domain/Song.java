@@ -76,7 +76,7 @@ public class Song extends BaseEntity {
         this.bpm = bpm;
         this.modulation = modulation;
 
-        if(lyrics != null) {
+        if (lyrics != null) {
             // 가사 업데이트
             for (int i = 0; i < this.lyricsList.size(); ++i) {
                 if (i < lyrics.size()) {
@@ -95,7 +95,7 @@ public class Song extends BaseEntity {
             }
         }
 
-        if(songGenres != null) {
+        if (songGenres != null) {
             // 장르 업데이트
             for (int i = 0; i < this.songGenres.size(); ++i) {
                 if (i < songGenres.size()) {

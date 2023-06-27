@@ -164,13 +164,14 @@ public class SongService {
 
     @Transactional
     public void modifySong(Long songId, CreateSongDto createSongDto) {
-        if (songRepository.findById(songId).isEmpty())
+        Optional<Song> optional = songRepository.findById(songId);
+        if (optional.isEmpty())
             throw new NoSuchDataException();
 
         if (createSongDto == null)
             throw new InvalidInputException();
 
-        Song song = songRepository.findById(songId).get();
+        Song song = optional.get();
 
         List<SongGenre> songGenres = new ArrayList<>();
         for (int i = 0; i < createSongDto.getGenres().size(); ++i) {
@@ -205,6 +206,16 @@ public class SongService {
                 lyricsList,
                 songGenres
         );
+    }
+
+    @Transactional
+    public void removeSongData(Long songId) {
+        Optional<Song> optional = songRepository.findById(songId);
+        if (optional.isEmpty())
+            throw new NoSuchDataException();
+
+        Song song = optional.get();
+        songRepository.delete(song);
     }
 
     private String findNextModulationKey(String curKey, Song song, List<DetailLyricsDto> lyrics) {
