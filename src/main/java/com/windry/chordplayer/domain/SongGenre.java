@@ -28,4 +28,8 @@ public class SongGenre {
         this.song = song;
         this.genre = genre;
     }
+
+    public void changeSongGenre(Genre genre) {
+        this.genre = genre;
+    }
 }

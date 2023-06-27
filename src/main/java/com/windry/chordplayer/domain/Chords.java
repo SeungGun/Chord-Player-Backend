@@ -30,4 +30,8 @@ public class Chords extends BaseEntity {
     public void changeLyrics(Lyrics lyrics) {
         this.lyrics = lyrics;
     }
+
+    public void updateChord(String chord) {
+        this.chord = chord;
+    }
 }

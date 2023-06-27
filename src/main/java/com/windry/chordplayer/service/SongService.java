@@ -162,6 +162,51 @@ public class SongService {
                 .build();
     }
 
+    @Transactional
+    public void modifySong(Long songId, CreateSongDto createSongDto) {
+        if (songRepository.findById(songId).isEmpty())
+            throw new NoSuchDataException();
+
+        if (createSongDto == null)
+            throw new InvalidInputException();
+
+        Song song = songRepository.findById(songId).get();
+
+        List<SongGenre> songGenres = new ArrayList<>();
+        for (int i = 0; i < createSongDto.getGenres().size(); ++i) {
+            Optional<Genre> genre = genreRepository.findGenreByName(createSongDto.getGenres().get(i));
+            if (genre.isPresent()) {
+                SongGenre songGenre = SongGenre.builder()
+                        .genre(genre.get())
+                        .song(song)
+                        .build();
+                songGenres.add(songGenre);
+            }
+        }
+
+        List<Lyrics> lyricsList = new ArrayList<>();
+        for (int i = 0; i < createSongDto.getContents().size(); ++i) {
+            Lyrics lyrics = Lyrics.builder()
+                    .line(i + 1)
+                    .lyrics(createSongDto.getContents().get(i).getLyrics())
+                    .tag(Tag.findTagByString(createSongDto.getContents().get(i).getTag()))
+                    .build();
+            lyrics.changeAllChords(createSongDto.getContents().get(i).getChords());
+            lyricsList.add(lyrics);
+        }
+
+        song.changeRequestFields(
+                createSongDto.getTitle(),
+                createSongDto.getArtist(),
+                createSongDto.getOriginalKey(),
+                createSongDto.getGender(),
+                createSongDto.getBpm(),
+                createSongDto.getModulation(),
+                lyricsList,
+                songGenres
+        );
+    }
+
     private String findNextModulationKey(String curKey, Song song, List<DetailLyricsDto> lyrics) {
         for (DetailLyricsDto lyric : lyrics) {
             if (lyric.getTag() != null && lyric.getTag().equals(Tag.MODULATION)) {
