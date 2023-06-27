@@ -3,6 +3,7 @@ package com.windry.chordplayer.service;
 import com.windry.chordplayer.dto.DetailSongDto;
 import com.windry.chordplayer.dto.FiltersOfDetailSong;
 import com.windry.chordplayer.exception.ImpossibleConvertGenderException;
+import com.windry.chordplayer.exception.NoSuchDataException;
 import com.windry.chordplayer.spec.Gender;
 import com.windry.chordplayer.domain.Genre;
 import com.windry.chordplayer.domain.Song;
@@ -449,5 +450,63 @@ class SongServiceTest {
         Assertions.assertEquals("B7", modifiedSong.getLyricsList().get(0).getChords().get(0).getChord());
         Assertions.assertEquals("A/E", modifiedSong.getLyricsList().get(2).getChords().get(1).getChord());
         Assertions.assertEquals("국결 난 지렸거근두", modifiedSong.getLyricsList().get(3).getLyrics());
+    }
+
+    @Test
+    @DisplayName("노래 데이터를 삭제하면 장르 중간 테이블과 가사, 코드 데이터는 모두 조회되지 않아야한다.")
+    void deleteSong() {
+        // given
+        Genre genre = Genre.builder().name("락").build();
+        genreRepository.save(genre);
+
+        List<String> genreList = new ArrayList<>();
+        genreList.add("락");
+
+        CreateSongDto songDto = CreateSongDto.builder()
+                .title("하늘을 달리다")
+                .artist("이적")
+                .originalKey("E")
+                .bpm(116)
+                .gender(Gender.MALE)
+                .modulation(null)
+                .contents(null)
+                .genres(genreList)
+                .build();
+
+        List<LyricsDto> lyricsDtoList = new ArrayList<>();
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("B", "A"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("E", "A"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("B", "A"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("두근거렸지 난 결국")
+                .chords(LyricsDto.getAllChords("E", "Aadd2"))
+                .build());
+        songDto.setContents(lyricsDtoList);
+
+        Long newSong = songService.createNewSong(songDto);
+        // when
+
+        songService.removeSongData(newSong);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // then
+        Assertions.assertThrows(NoSuchDataException.class, () -> songService.getDetailSong(newSong, null, null, null, null));
+        Assertions.assertEquals(0, lyricsRepository.findAll().size());
+        Assertions.assertEquals(0, chordsRepository.findAll().size());
     }
 }
