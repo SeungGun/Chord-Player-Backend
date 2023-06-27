@@ -15,6 +15,7 @@ import com.windry.chordplayer.repository.GenreRepository;
 import com.windry.chordplayer.repository.LyricsRepository;
 import com.windry.chordplayer.repository.SongRepository;
 import com.windry.chordplayer.spec.Tuning;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,8 @@ class SongServiceTest {
     private GenreRepository genreRepository;
     @Autowired
     private SongService songService;
+    @Autowired
+    private EntityManager entityManager;
 
     @DisplayName("노래 데이터를 생성할 때, 중복되는 제목과 가수가 있을 경우 예외를 발생한다.")
     @Test
@@ -58,10 +61,12 @@ class SongServiceTest {
                 .gender(Gender.MALE)
                 .modulation(null)
                 .contents(null)
+                .genres(null)
                 .build();
 
+        List<SongGenre> songGenres = new ArrayList<>();
         SongGenre songGenre = SongGenre.builder().genre(genre).song(song).build();
-        song.addGenre(songGenre);
+        songGenres.add(songGenre);
 
         song.changeRequestFields(
                 songDto.getTitle(),
@@ -70,11 +75,11 @@ class SongServiceTest {
                 songDto.getGender(),
                 songDto.getBpm(),
                 songDto.getModulation(),
-                null);
+                null,
+                songGenres);
 
         Song differentArtistSong = new Song();
 
-        differentArtistSong.addGenre(songGenre);
         differentArtistSong.changeRequestFields(
                 songDto.getTitle(),
                 "허각",
@@ -82,15 +87,18 @@ class SongServiceTest {
                 songDto.getGender(),
                 songDto.getBpm(),
                 songDto.getModulation(),
-                null
+                null,
+                songGenres
         );
+
         // when
-        songRepository.save(song);
-        songRepository.save(differentArtistSong);
+        Song song1 = songRepository.save(song);
+        Song song2 = songRepository.save(differentArtistSong);
 
         // then
-        Assertions.assertEquals("허각", songRepository.findById(2L).get().getArtist());
-        Assertions.assertEquals(1, songRepository.findById(2L).get().getSongGenres().size());
+        Assertions.assertEquals("이적", songRepository.findById(song1.getId()).get().getArtist());
+        Assertions.assertEquals("허각", songRepository.findById(song2.getId()).get().getArtist());
+        Assertions.assertEquals(1, songRepository.findById(song2.getId()).get().getSongGenres().size());
         Assertions.assertThrows(DuplicateTitleAndArtistException.class, () -> songService.validateDupSongAndArtist("하늘을달리다", "이적"));
     }
 
@@ -103,7 +111,7 @@ class SongServiceTest {
 
         Song song = new Song();
         song.changeRequestFields(
-                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null
+                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null, null
         );
 
         List<String> genreList = new ArrayList<>();
@@ -305,10 +313,10 @@ class SongServiceTest {
                 .capo(null)
                 .build();
 
-        DetailSongDto detailSong = songService.getDetailSong(1L, 0L, 10L, filters, "Db");
-        DetailSongDto detailSong2 = songService.getDetailSong(1L, 0L, 20L, filters, "Db");
-        DetailSongDto detailSong3 = songService.getDetailSong(1L, 0L, 20L, filters2, "Db");
-        DetailSongDto detailSong5 = songService.getDetailSong(1L, 0L, 10L, filters4, "Db");
+        DetailSongDto detailSong = songService.getDetailSong(newSong, 0L, 10L, filters, "Db");
+        DetailSongDto detailSong2 = songService.getDetailSong(newSong, 0L, 20L, filters, "Db");
+        DetailSongDto detailSong3 = songService.getDetailSong(newSong, 0L, 20L, filters2, "Db");
+        DetailSongDto detailSong5 = songService.getDetailSong(newSong, 0L, 10L, filters4, "Db");
 
         // then
         Assertions.assertEquals(10, detailSong.getContents().size());
@@ -317,10 +325,129 @@ class SongServiceTest {
         Assertions.assertEquals("F", detailSong3.getCurrentKey());
         Assertions.assertEquals("C", detailSong5.getCurrentKey());
 
-        Assertions.assertThrows(ImpossibleConvertGenderException.class, () -> songService.getDetailSong(1L, 0L, 10L, filters3, "Db"));
+        Assertions.assertThrows(ImpossibleConvertGenderException.class, () -> songService.getDetailSong(newSong, 0L, 10L, filters3, "Db"));
 
         Assertions.assertEquals("C", detailSong.getContents().get(0).getChords().get(0));
         Assertions.assertEquals("G", detailSong.getContents().get(0).getChords().get(1));
         Assertions.assertEquals("Am7", detailSong.getContents().get(1).getChords().get(0));
+    }
+
+    @Test
+    @DisplayName("기존 생성된 노래의 장르 또는 가사 또는 코드를 변경하면 반영된다.")
+    void modifyExistSong() {
+
+        // given
+        Genre genre = Genre.builder().name("락").build();
+        Genre genre2 = Genre.builder().name("발라드").build();
+        Genre genre3 = Genre.builder().name("재즈").build();
+        Genre genre4 = Genre.builder().name("팝").build();
+
+        genreRepository.save(genre);
+        genreRepository.save(genre2);
+        genreRepository.save(genre3);
+        genreRepository.save(genre4);
+
+        Song song = new Song();
+        song.changeRequestFields(
+                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null, null
+        );
+
+        List<String> genreList = new ArrayList<>();
+        genreList.add("락");
+
+        CreateSongDto songDto = CreateSongDto.builder()
+                .title("하늘을 달리다")
+                .artist("이적")
+                .originalKey("E")
+                .bpm(116)
+                .gender(Gender.MALE)
+                .modulation(null)
+                .contents(null)
+                .genres(genreList)
+                .build();
+
+        List<LyricsDto> lyricsDtoList = new ArrayList<>();
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("B", "A"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("E", "A"))
+                .build());
+
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("B", "A"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("두근거렸지 난 결국")
+                .chords(LyricsDto.getAllChords("E", "Aadd2"))
+                .build());
+        songDto.setContents(lyricsDtoList);
+
+        Long newSong = songService.createNewSong(songDto);
+
+        CreateSongDto modifyDto = CreateSongDto.builder()
+                .title("하늘을 달리다")
+                .artist("이적")
+                .originalKey("E")
+                .bpm(116)
+                .gender(Gender.FEMALE)
+                .modulation(null)
+                .contents(null)
+                .build();
+
+        List<LyricsDto> modifyLyrics = new ArrayList<>();
+        modifyLyrics.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("B7", "A"))
+                .build());
+        modifyLyrics.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("E", "A/E"))
+                .build());
+
+        modifyLyrics.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("B", "A/E"))
+                .build());
+        modifyLyrics.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("국결 난 지렸거근두")
+                .chords(LyricsDto.getAllChords("E", "Aadd2"))
+                .build());
+        modifyDto.setContents(modifyLyrics);
+
+        genreList.clear();
+        genreList.add("재즈");
+        genreList.add("팝");
+
+        modifyDto.setGenres(genreList);
+        // when
+
+        songService.modifySong(newSong, modifyDto);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Song modifiedSong = songRepository.findById(newSong).get();
+
+        // then
+
+        Assertions.assertEquals(2, modifiedSong.getSongGenres().size());
+        Assertions.assertEquals("재즈", modifiedSong.getSongGenres().get(0).getGenre().getName());
+        Assertions.assertEquals("팝", modifiedSong.getSongGenres().get(1).getGenre().getName());
+        Assertions.assertEquals(Gender.FEMALE, modifiedSong.getGender());
+        Assertions.assertEquals("B7", modifiedSong.getLyricsList().get(0).getChords().get(0).getChord());
+        Assertions.assertEquals("A/E", modifiedSong.getLyricsList().get(2).getChords().get(1).getChord());
+        Assertions.assertEquals("국결 난 지렸거근두", modifiedSong.getLyricsList().get(3).getLyrics());
     }
 }
