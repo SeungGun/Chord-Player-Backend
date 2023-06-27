@@ -25,7 +25,7 @@ public class Lyrics extends BaseEntity {
     @JoinColumn(name = "SONG_ID")
     private Song song;
 
-    @OneToMany(mappedBy = "lyrics", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "lyrics", cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Chords> chords = new ArrayList<>();
 
@@ -44,16 +44,42 @@ public class Lyrics extends BaseEntity {
         this.tag = tag;
     }
 
-    public void changeSong(Song song){
+    public void changeSong(Song song) {
         this.song = song;
     }
 
-    public void addChords(Chords chord){
+    public void addChords(Chords chord) {
         chords.add(chord);
         chord.changeLyrics(this);
     }
 
-    public List<String> convertStringChords(List<Chords> chords){
+    public void changeAllChords(List<String> chords) {
+        this.chords = chords.stream().map(c -> Chords.builder().chord(c).build()).toList();
+    }
+
+    public List<String> convertStringChords(List<Chords> chords) {
         return chords.stream().map(Chords::getChord).toList();
+    }
+
+    public void updateLyrics(Tag tag, String lyrics, List<Chords> chords) {
+        this.tag = tag;
+        this.lyrics = lyrics;
+
+        // 코드 업데이트
+        for (int i = 0; i < this.chords.size(); ++i) {
+            if (i < chords.size()) {
+                Chords chords1 = this.chords.get(i);
+                Chords chords2 = chords.get(i);
+                chords1.updateChord(chords2.getChord());
+            } else {
+                this.chords.remove(i);
+                i--;
+            }
+        }
+
+        for (int i = this.chords.size(); i < chords.size(); ++i) {
+            Chords chords1 = chords.get(i);
+            this.chords.add(chords1);
+        }
     }
 }
