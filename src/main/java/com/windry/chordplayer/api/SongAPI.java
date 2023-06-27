@@ -103,9 +103,12 @@ public class SongAPI {
         return ResponseEntity.ok().build();
     }
 
-//    @DeleteMapping("/{songId}")
-//    public ResponseEntity<Void> deleteSong(){
-//
-//    }
+    @DeleteMapping("/{songId}")
+    public ResponseEntity<Void> deleteSong(
+            @PathVariable("songId") Long songId
+    ) {
+        songService.removeSongData(songId);
+        return ResponseEntity.ok().build();
+    }
 
 }
