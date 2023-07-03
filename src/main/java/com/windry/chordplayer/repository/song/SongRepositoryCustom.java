@@ -1,8 +1,8 @@
-package com.windry.chordplayer.repository;
+package com.windry.chordplayer.repository.song;
 
 import com.windry.chordplayer.domain.Song;
-import com.windry.chordplayer.dto.FiltersOfSongList;
-import com.windry.chordplayer.dto.SongListItemDto;
+import com.windry.chordplayer.dto.song.FiltersOfSongList;
+import com.windry.chordplayer.dto.song.SongListItemDto;
 
 import java.util.List;
 

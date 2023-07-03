@@ -1,4 +1,4 @@
-package com.windry.chordplayer.dto;
+package com.windry.chordplayer.dto.lyrics;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,8 +1,8 @@
 package com.windry.chordplayer.service;
 
 import com.windry.chordplayer.domain.Genre;
-import com.windry.chordplayer.dto.CreateGenreDto;
-import com.windry.chordplayer.dto.GenreListDto;
+import com.windry.chordplayer.dto.genre.CreateGenreDto;
+import com.windry.chordplayer.dto.genre.GenreListDto;
 import com.windry.chordplayer.exception.DuplicateGenreNameException;
 import com.windry.chordplayer.exception.InvalidInputException;
 import com.windry.chordplayer.exception.NoSuchDataException;

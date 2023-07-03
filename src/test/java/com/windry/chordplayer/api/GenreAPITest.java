@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.windry.chordplayer.domain.Genre;
-import com.windry.chordplayer.dto.CreateGenreDto;
+import com.windry.chordplayer.dto.genre.CreateGenreDto;
 import com.windry.chordplayer.repository.GenreRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -63,7 +62,6 @@ class GenreAPITest {
                                 fieldWithPath("genreId").description("장르의 고유 ID")
                         )
                 ));
-
     }
 
     @DisplayName("이미 존재하는 장르 이름으로 생성하는 경우 예외가 발생한다.")
@@ -83,7 +81,6 @@ class GenreAPITest {
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
-
     }
 
     @DisplayName("장르 데이터를 삭제한다.")

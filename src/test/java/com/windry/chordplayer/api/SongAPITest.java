@@ -6,10 +6,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.windry.chordplayer.domain.Genre;
 import com.windry.chordplayer.domain.Song;
 import com.windry.chordplayer.domain.SongGenre;
-import com.windry.chordplayer.dto.CreateSongDto;
-import com.windry.chordplayer.dto.LyricsDto;
+import com.windry.chordplayer.dto.song.CreateSongDto;
+import com.windry.chordplayer.dto.lyrics.LyricsDto;
 import com.windry.chordplayer.repository.GenreRepository;
-import com.windry.chordplayer.repository.SongRepository;
+import com.windry.chordplayer.repository.song.SongRepository;
 import com.windry.chordplayer.spec.Gender;
 import com.windry.chordplayer.spec.SearchCriteria;
 import com.windry.chordplayer.spec.SortStrategy;
@@ -124,7 +124,7 @@ class SongAPITest {
     @DisplayName("제목은 중복되도 가수 이름이 다르면 성공적으로 노래가 생성된다.")
     @Test
     void createSong() throws Exception {
-        Genre genre = Genre.builder().name("락").build();
+        Genre genre = Genre.builder().name("발라드").build();
         genreRepository.save(genre);
 
         Song song = new Song();
@@ -135,45 +135,117 @@ class SongAPITest {
         List<SongGenre> genres = new ArrayList<>();
         genres.add(songGenre);
         song.changeRequestFields(
-                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null, genres
+                "다정히 내 이름을 부르면", "경서예지", "Db", Gender.FEMALE, 72, null, null, genres
         );
         songRepository.save(song);
 
         List<String> genreList = new ArrayList<>();
-        genreList.add("락");
+        genreList.add("발라드");
 
         CreateSongDto dto = CreateSongDto.builder()
-                .title("하늘을 달리다")
-                .artist("허각")
-                .originalKey("E")
-                .bpm(116)
-                .gender(Gender.MALE)
-                .modulation(null)
+                .title("다정히 내 이름을 부르면")
+                .artist("경서예지, 전건호")
+                .originalKey("Db")
+                .bpm(72)
+                .gender(Gender.MIXED)
+                .modulation("Db-Eb-F-G")
                 .contents(null)
                 .genres(genreList)
+                .note("이 노래는 두키씩 키 변경 일어남.")
                 .build();
+
         List<LyricsDto> lyricsDtoList = new ArrayList<>();
         lyricsDtoList.add(LyricsDto.builder()
                 .tag("INTRO")
                 .lyrics(null)
-                .chords(LyricsDto.getAllChords("B", "A"))
+                .chords(LyricsDto.getAllChords("Db", "Ab"))
                 .build());
         lyricsDtoList.add(LyricsDto.builder()
                 .tag("INTRO")
                 .lyrics(null)
-                .chords(LyricsDto.getAllChords("E", "A"))
+                .chords(LyricsDto.getAllChords("Bbm7", "Fm7"))
                 .build());
-
         lyricsDtoList.add(LyricsDto.builder()
                 .tag("INTRO")
                 .lyrics(null)
-                .chords(LyricsDto.getAllChords("B", "A"))
+                .chords(LyricsDto.getAllChords("Gb", "Gbm6"))
                 .build());
         lyricsDtoList.add(LyricsDto.builder()
                 .tag(null)
-                .lyrics("두근거렸지 난 결국")
-                .chords(LyricsDto.getAllChords("E", "Aadd2"))
+                .lyrics("끝 없")
+                .chords(LyricsDto.getAllChords("Db", "Dbsus4", "Db"))
                 .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("이 별빛이 내리던 밤")
+                .chords(LyricsDto.getAllChords("Db", "Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("기분 좋은 바람이")
+                .chords(LyricsDto.getAllChords("Bbm7", "Db/Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("두 뺨을 스치고")
+                .chords(LyricsDto.getAllChords("Gb", "Db/F"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("새벽 바다 한 곳을 보")
+                .chords(LyricsDto.getAllChords("Ebm", "Gb/Ab", "Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("는 아름다운 너와 나")
+                .chords(LyricsDto.getAllChords("Db", "Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("그림을 그려갔어")
+                .chords(LyricsDto.getAllChords("Bbm", "Bbm7/Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("모래 위 떨린 손")
+                .chords(LyricsDto.getAllChords("Gbm", "Gbm6"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("끝으로 날 향")
+                .chords(LyricsDto.getAllChords("Db", "Fm/C"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("해 웃어주는 입술")
+                .chords(LyricsDto.getAllChords("Bbm", "BbmM7/A"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("사랑스러운 두눈을 가진 네")
+                .chords(LyricsDto.getAllChords("Ebm", "Db/F", "Gb", "Eb7/G"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("MODULATION")
+                .lyrics("가 다정히 내 이름을")
+                .chords(LyricsDto.getAllChords("Ab", "Bb"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("부르면 내 마음이")
+                .chords(LyricsDto.getAllChords("Eb", "Bb"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("녹아내려 언제나")
+                .chords(LyricsDto.getAllChords("Cm", "Cm7/Bb"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("나 하날 위해 준비된")
+                .chords(LyricsDto.getAllChords("Ab", "Eb/G"))
+                .build());
+
         dto.setContents(lyricsDtoList);
 
         objectMapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
@@ -192,13 +264,13 @@ class SongAPITest {
                                 fieldWithPath("title").description("노래의 제목"),
                                 fieldWithPath("artist").description("노래의 가수"),
                                 fieldWithPath("originalKey").description("노래의 원키"),
-                                fieldWithPath("gender").description("노래를 부른 가수의 성별"),
-                                fieldWithPath("note").description("이 노래에 작성할 메모").optional(),
-                                fieldWithPath("bpm").description("노래의 BPM").optional(),
-                                fieldWithPath("modulation").description("노래의 전조").optional(),
+                                fieldWithPath("gender").description("노래를 부른 가수의 성별(MALE, FEMALE, MIXED)"),
+                                fieldWithPath("note").description("이 노래에 작성할 메모(option)").optional(),
+                                fieldWithPath("bpm").description("노래의 BPM(option)").optional(),
+                                fieldWithPath("modulation").description("노래의 전조(option)").optional(),
                                 fieldWithPath("genres[]").description("노래의 장르 목록"),
-                                fieldWithPath("contents[].lyrics").description("노래의 가사").optional(),
-                                fieldWithPath("contents[].tag").description("현재 마디의 상태").optional(),
+                                fieldWithPath("contents[].lyrics").description("노래의 가사(option)").optional(),
+                                fieldWithPath("contents[].tag").description("현재 마디의 상태[INTRO, INTERLUDE, MODULATION, BRIDGE, OUTRO](option)").optional(),
                                 fieldWithPath("contents[].chords[]").description("현재 마디의 코드 목록")
                         ),
                         responseFields(
@@ -206,7 +278,6 @@ class SongAPITest {
                         )
                 ));
     }
-
 
     @DisplayName("노래 목록을 조회할 때, 모든 필터를 적용해본다. ")
     @Test
@@ -241,12 +312,12 @@ class SongAPITest {
                         queryParameters(
                                 parameterWithName("page").description("페이지 시작 위치에 대한 노래 ID"),
                                 parameterWithName("size").description("가져올 목록의 개수"),
-                                parameterWithName("searchCriteria").description("검색 기준(제목, 가수)").optional(),
-                                parameterWithName("keyword").description("검색하고자 하는 키워드").optional(),
-                                parameterWithName("gender").description("검색하고자 하는 성별").optional(),
-                                parameterWithName("key").description("검색하고자 하는 노래의 원키").optional(),
-                                parameterWithName("genre").description("검색하고자 하는 노래의 장르").optional(),
-                                parameterWithName("sort").description("목록의 정렬 기준").optional()
+                                parameterWithName("searchCriteria").description("검색 기준[TITLE, ARTIST](option)").optional(),
+                                parameterWithName("keyword").description("검색하고자 하는 키워드(option)").optional(),
+                                parameterWithName("gender").description("검색하고자 하는 성별[MALE, FEMALE, MIXED](option)").optional(),
+                                parameterWithName("key").description("검색하고자 하는 노래의 원키(option)").optional(),
+                                parameterWithName("genre").description("검색하고자 하는 노래의 장르(option)").optional(),
+                                parameterWithName("sort").description("목록의 정렬 기준[CHRONOLOGICAL, NAME, VIEW](option)").optional()
                         ),
                         responseFields(
                                 fieldWithPath("[]").description("노래 목록"),
@@ -254,9 +325,9 @@ class SongAPITest {
                                 fieldWithPath("[].title").description("노래의 제목"),
                                 fieldWithPath("[].artist").description("노래의 가수"),
                                 fieldWithPath("[].originalKey").description("노래의 원키"),
-                                fieldWithPath("[].bpm").description("노래의 BPM"),
-                                fieldWithPath("[].modulation").description("노래의 전조"),
-                                fieldWithPath("[].note").description("노래의 노트"),
+                                fieldWithPath("[].bpm").description("노래의 BPM(option)"),
+                                fieldWithPath("[].modulation").description("노래의 전조(option)"),
+                                fieldWithPath("[].note").description("노래의 노트(option)"),
                                 fieldWithPath("[].gender").description("노래의 성별"),
                                 fieldWithPath("[].genres[]").description("노래의 장르")
                         )
@@ -349,6 +420,8 @@ class SongAPITest {
                 )
                 .andExpect(status().isOk())
                 .andDo(document("songs/get-detail",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         pathParameters(
                                 parameterWithName("songId").description("노래의 고유 ID")
                         ),
@@ -356,11 +429,11 @@ class SongAPITest {
                                 parameterWithName("currentKey").description("현재 마디에서의 노래 키"),
                                 parameterWithName("offset").description("마지막 가사 마디의 위치"),
                                 parameterWithName("size").description("가져올 가사의 마디 개수"),
-                                parameterWithName("capo").description("기타 카포 적용 크기").optional(),
-                                parameterWithName("tuning").description("기타 튜닝의 종류").optional(),
-                                parameterWithName("gender").description("남/여 키 변경 여부").optional(),
-                                parameterWithName("key-up").description("키 올림 여부").optional(),
-                                parameterWithName("key").description("키 변경할 크기").optional()
+                                parameterWithName("capo").description("기타 카포 적용 크기(option)").optional(),
+                                parameterWithName("tuning").description("기타 튜닝의 종류[STANDARD, HALF_STEP, WHOLE_STEP](option)").optional(),
+                                parameterWithName("gender").description("남/여 키 변경 여부(option)").optional(),
+                                parameterWithName("key-up").description("키 올림 여부(option)").optional(),
+                                parameterWithName("key").description("키 변경할 크기(option)").optional()
                         ),
                         responseFields(
                                 fieldWithPath("title").description("노래의 제목"),
@@ -368,8 +441,8 @@ class SongAPITest {
                                 fieldWithPath("currentKey").description("현재 노래의 키"),
                                 fieldWithPath("gender").description("현재 노래의 성별"),
                                 fieldWithPath("contents[].line").description("현재 노래의 마디"),
-                                fieldWithPath("contents[].lyrics").description("현재 마디의 가사").optional(),
-                                fieldWithPath("contents[].tag").description("현재 마디의 태그(상태)").optional(),
+                                fieldWithPath("contents[].lyrics").description("현재 마디의 가사(option)").optional(),
+                                fieldWithPath("contents[].tag").description("현재 마디의 태그(상태)(option)").optional(),
                                 fieldWithPath("contents[].chords[]").description("현재 마디의 코드 목록")
                         )
 
@@ -377,7 +450,6 @@ class SongAPITest {
                 .andReturn();
 
         JSONObject jsonObject2 = new JSONObject(result.getResponse().getContentAsString());
-
         Assertions.assertEquals("F#", jsonObject2.optJSONArray("contents").getJSONObject(0).getJSONArray("chords").get(0));
     }
 
@@ -385,40 +457,112 @@ class SongAPITest {
     @Test
     void modifySongForLyrics() throws Exception {
         List<String> genreList = new ArrayList<>();
-        genreList.add("락");
+        genreList.add("발라드");
 
         CreateSongDto dto = CreateSongDto.builder()
-                .title("하늘을 달리다")
-                .artist("허각")
-                .originalKey("E")
-                .bpm(116)
-                .gender(Gender.MALE)
-                .modulation(null)
+                .title("다정히 내 이름을 부르면")
+                .artist("경서예지")
+                .originalKey("Db")
+                .bpm(72)
+                .gender(Gender.MIXED)
+                .modulation("Db-Eb-F-G")
                 .contents(null)
                 .genres(genreList)
+                .note("이 노래는 두키씩 키 변경 일어남.")
                 .build();
+
         List<LyricsDto> lyricsDtoList = new ArrayList<>();
         lyricsDtoList.add(LyricsDto.builder()
                 .tag("INTRO")
                 .lyrics(null)
-                .chords(LyricsDto.getAllChords("B", "A"))
+                .chords(LyricsDto.getAllChords("Db", "Ab"))
                 .build());
         lyricsDtoList.add(LyricsDto.builder()
                 .tag("INTRO")
                 .lyrics(null)
-                .chords(LyricsDto.getAllChords("E", "A"))
+                .chords(LyricsDto.getAllChords("Bbm7", "Fm7"))
                 .build());
-
         lyricsDtoList.add(LyricsDto.builder()
                 .tag("INTRO")
                 .lyrics(null)
-                .chords(LyricsDto.getAllChords("B", "A"))
+                .chords(LyricsDto.getAllChords("Gb", "Gbm6"))
                 .build());
         lyricsDtoList.add(LyricsDto.builder()
                 .tag(null)
-                .lyrics("두근거렸지 난 결국")
-                .chords(LyricsDto.getAllChords("E", "Aadd2"))
+                .lyrics("끝 없")
+                .chords(LyricsDto.getAllChords("Db", "Dbsus4", "Db"))
                 .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("이 별빛이 내리던 밤")
+                .chords(LyricsDto.getAllChords("Db", "Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("기분 좋은 바람이")
+                .chords(LyricsDto.getAllChords("Bbm7", "Db/Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("두 뺨을 스치고")
+                .chords(LyricsDto.getAllChords("Gb", "Db/F"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("새벽 바다 한 곳을 보")
+                .chords(LyricsDto.getAllChords("Ebm", "Gb/Ab", "Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("는 아름다운 너와 나")
+                .chords(LyricsDto.getAllChords("Db", "Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("그림을 그려갔어")
+                .chords(LyricsDto.getAllChords("Bbm", "Bbm7/Ab"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("모래 위 떨린 손")
+                .chords(LyricsDto.getAllChords("Gbm", "Gbm6"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("끝으로 날 향")
+                .chords(LyricsDto.getAllChords("Db", "Fm/C"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("해 웃어주는 입술")
+                .chords(LyricsDto.getAllChords("Bbm", "BbmM7/A"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("사랑스러운 두눈을 가진 네")
+                .chords(LyricsDto.getAllChords("Ebm", "Db/F", "Gb", "Eb7/G"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("MODULATION")
+                .lyrics("가 다정히 내 이름을")
+                .chords(LyricsDto.getAllChords("Ab", "Bb"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("부르면 내 마음이")
+                .chords(LyricsDto.getAllChords("Eb", "Bb"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("녹아내려 언제나")
+                .chords(LyricsDto.getAllChords("Cm", "Cm7/Bb"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("나 하날 위해 준비된")
+                .chords(LyricsDto.getAllChords("Ab", "Eb/G"))
+                .build());
+
         dto.setContents(lyricsDtoList);
 
         objectMapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
@@ -435,7 +579,12 @@ class SongAPITest {
         MockHttpServletResponse response = mvcResult.getResponse();
         JSONObject jsonObject = new JSONObject(response.getContentAsString());
 
-        dto.getContents().get(dto.getContents().size() - 1).setLyrics("국결 난 지렸거근두");
+        dto.getContents().get(dto.getContents().size() - 1).setLyrics("된비준 해위 날하 나");
+        List<String> chords = new ArrayList<>();
+        chords.add("Cm/F#");
+        chords.add("C#sus4/Bb");
+
+        dto.getContents().get(dto.getContents().size() - 2).setChords(chords);
         String modifyJson = objectWriter.writeValueAsString(dto);
         this.mockMvc.perform(put("/api/songs/{songId}", jsonObject.optLong("songId"))
                         .content(modifyJson)
@@ -451,13 +600,13 @@ class SongAPITest {
                                 fieldWithPath("title").description("노래의 제목"),
                                 fieldWithPath("artist").description("노래의 가수"),
                                 fieldWithPath("originalKey").description("노래의 원키"),
-                                fieldWithPath("gender").description("노래를 부른 가수의 성별"),
-                                fieldWithPath("note").description("이 노래에 작성할 메모").optional(),
-                                fieldWithPath("bpm").description("노래의 BPM").optional(),
-                                fieldWithPath("modulation").description("노래의 전조").optional(),
+                                fieldWithPath("gender").description("노래를 부른 가수의 성별[MALE, FEMALE, MIXED]"),
+                                fieldWithPath("note").description("이 노래에 작성할 메모(option)").optional(),
+                                fieldWithPath("bpm").description("노래의 BPM(option)").optional(),
+                                fieldWithPath("modulation").description("노래의 전조(option)").optional(),
                                 fieldWithPath("genres[]").description("노래의 장르 목록"),
-                                fieldWithPath("contents[].lyrics").description("노래의 가사").optional(),
-                                fieldWithPath("contents[].tag").description("현재 마디의 상태").optional(),
+                                fieldWithPath("contents[].lyrics").description("노래의 가사(option)").optional(),
+                                fieldWithPath("contents[].tag").description("현재 마디의 상태[INTRO, INTERLUDE, MODULATION, BRIDGE, OUTRO](option)").optional(),
                                 fieldWithPath("contents[].chords[]").description("현재 마디의 코드 목록")
                         )
                 ));
@@ -530,8 +679,7 @@ class SongAPITest {
                         pathParameters(
                                 parameterWithName("songId").description("노래의 고유 ID")
                         ))
-                )
-        ;
+                );
     }
 
     @DisplayName("존재하지 않는 노래에 대해 삭제를 시도하는 경우 예외가 발생한다.")

@@ -1,6 +1,6 @@
-package com.windry.chordplayer.repository;
+package com.windry.chordplayer.repository.lyrics;
 
-import com.windry.chordplayer.dto.DetailLyricsDto;
+import com.windry.chordplayer.dto.lyrics.DetailLyricsDto;
 
 import java.util.List;
 

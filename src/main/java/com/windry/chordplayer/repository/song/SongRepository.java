@@ -1,4 +1,4 @@
-package com.windry.chordplayer.repository;
+package com.windry.chordplayer.repository.song;
 
 import com.windry.chordplayer.domain.Song;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,7 +1,7 @@
 package com.windry.chordplayer.api;
 
-import com.windry.chordplayer.dto.CreateGenreDto;
-import com.windry.chordplayer.dto.GenreListDto;
+import com.windry.chordplayer.dto.genre.CreateGenreDto;
+import com.windry.chordplayer.dto.genre.GenreListDto;
 import com.windry.chordplayer.service.GenreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

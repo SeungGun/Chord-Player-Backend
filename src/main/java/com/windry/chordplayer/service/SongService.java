@@ -1,15 +1,17 @@
 package com.windry.chordplayer.service;
 
 import com.windry.chordplayer.domain.*;
-import com.windry.chordplayer.dto.*;
+import com.windry.chordplayer.dto.lyrics.DetailLyricsDto;
+import com.windry.chordplayer.dto.lyrics.LyricsDto;
+import com.windry.chordplayer.dto.song.*;
 import com.windry.chordplayer.exception.DuplicateTitleAndArtistException;
 import com.windry.chordplayer.exception.ImpossibleConvertGenderException;
 import com.windry.chordplayer.exception.InvalidInputException;
 import com.windry.chordplayer.exception.NoSuchDataException;
 import com.windry.chordplayer.repository.ChordsRepository;
 import com.windry.chordplayer.repository.GenreRepository;
-import com.windry.chordplayer.repository.LyricsRepository;
-import com.windry.chordplayer.repository.SongRepository;
+import com.windry.chordplayer.repository.lyrics.LyricsRepository;
+import com.windry.chordplayer.repository.song.SongRepository;
 import com.windry.chordplayer.spec.Gender;
 import com.windry.chordplayer.spec.Tag;
 import com.windry.chordplayer.util.ChordUtil;
