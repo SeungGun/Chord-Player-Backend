@@ -1,0 +1,28 @@
+[[Song-API]]
+== Song API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs // 문서에 표기되는 코드들의 하이라이팅을 highlightjs를 사용
+:toc: left // toc (Table Of Contents)를 문서의 좌측에 두기
+:toclevels: 2
+:sectlinks:
+
+[[Song-생성]]
+=== Song 생성
+operation::songs/create[snippets='http-request,request-fields,http-response,response-fields']
+
+[[Song-수정]]
+=== Song 수정
+operation::songs/modify[snippets='path-parameters,http-request,request-fields,http-response']
+
+[[Song-삭제]]
+=== Song 삭제
+operation::songs/delete[snippets='path-parameters,http-request,http-response']
+
+[[Song-전체-조회]]
+=== Song 전체 조회
+operation::songs/get-all[snippets='http-request,query-parameters,http-response']
+
+[[Song-상세-조회]]
+=== Song 상세 조회
+operation::songs/get-detail[snippets='http-request,query-parameters,http-response']
