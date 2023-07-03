@@ -33,8 +33,8 @@ public class SongAPI {
 
     @GetMapping("")
     public ResponseEntity<List<SongListItemDto>> getSongList(
-            @RequestParam("page") Long page,
-            @RequestParam("size") Long size,
+            @RequestParam(value = "page", defaultValue = "1") Long page,
+            @RequestParam(value = "size", defaultValue = "10") Long size,
             @RequestParam(value = "searchCriteria", required = false) SearchCriteria searchCriteria,
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "gender", required = false) Gender gender,
@@ -69,8 +69,8 @@ public class SongAPI {
             @RequestParam(value = "key-up", required = false) Boolean isKeyUp,
             @RequestParam(value = "key", required = false) Integer key,
             @RequestParam(value = "currentKey") String currentKey,
-            @RequestParam("offset") Long offset, // line 에 대한 offset
-            @RequestParam("size") Long size
+            @RequestParam(value = "offset", defaultValue = "0") Long offset, // line 에 대한 offset
+            @RequestParam(value = "size", defaultValue = "20") Long size
     ) {
 
         if (songId == null)
