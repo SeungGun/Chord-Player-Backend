@@ -1,4 +1,4 @@
-package com.windry.chordplayer.dto;
+package com.windry.chordplayer.dto.lyrics;
 
 import com.windry.chordplayer.spec.Tag;
 import lombok.Builder;

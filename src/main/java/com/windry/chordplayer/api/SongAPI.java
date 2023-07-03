@@ -1,6 +1,6 @@
 package com.windry.chordplayer.api;
 
-import com.windry.chordplayer.dto.*;
+import com.windry.chordplayer.dto.song.*;
 import com.windry.chordplayer.spec.Gender;
 import com.windry.chordplayer.spec.SearchCriteria;
 import com.windry.chordplayer.spec.SortStrategy;

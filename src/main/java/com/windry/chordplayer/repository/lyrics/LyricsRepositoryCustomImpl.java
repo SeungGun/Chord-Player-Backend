@@ -1,11 +1,11 @@
-package com.windry.chordplayer.repository;
+package com.windry.chordplayer.repository.lyrics;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.windry.chordplayer.domain.Lyrics;
-import com.windry.chordplayer.dto.DetailLyricsDto;
+import com.windry.chordplayer.dto.lyrics.DetailLyricsDto;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;

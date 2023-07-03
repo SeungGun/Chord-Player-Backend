@@ -1,20 +1,20 @@
 package com.windry.chordplayer.service;
 
-import com.windry.chordplayer.dto.DetailSongDto;
-import com.windry.chordplayer.dto.FiltersOfDetailSong;
+import com.windry.chordplayer.dto.song.DetailSongDto;
+import com.windry.chordplayer.dto.song.FiltersOfDetailSong;
 import com.windry.chordplayer.exception.ImpossibleConvertGenderException;
 import com.windry.chordplayer.exception.NoSuchDataException;
 import com.windry.chordplayer.spec.Gender;
 import com.windry.chordplayer.domain.Genre;
 import com.windry.chordplayer.domain.Song;
 import com.windry.chordplayer.domain.SongGenre;
-import com.windry.chordplayer.dto.CreateSongDto;
-import com.windry.chordplayer.dto.LyricsDto;
+import com.windry.chordplayer.dto.song.CreateSongDto;
+import com.windry.chordplayer.dto.lyrics.LyricsDto;
 import com.windry.chordplayer.exception.DuplicateTitleAndArtistException;
 import com.windry.chordplayer.repository.ChordsRepository;
 import com.windry.chordplayer.repository.GenreRepository;
-import com.windry.chordplayer.repository.LyricsRepository;
-import com.windry.chordplayer.repository.SongRepository;
+import com.windry.chordplayer.repository.lyrics.LyricsRepository;
+import com.windry.chordplayer.repository.song.SongRepository;
 import com.windry.chordplayer.spec.Tuning;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Assertions;

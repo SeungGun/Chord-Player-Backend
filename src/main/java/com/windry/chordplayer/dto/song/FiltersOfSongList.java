@@ -1,4 +1,4 @@
-package com.windry.chordplayer.dto;
+package com.windry.chordplayer.dto.song;
 
 import com.windry.chordplayer.spec.Gender;
 import com.windry.chordplayer.spec.SearchCriteria;

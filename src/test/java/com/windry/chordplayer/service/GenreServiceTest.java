@@ -1,6 +1,6 @@
 package com.windry.chordplayer.service;
 
-import com.windry.chordplayer.dto.CreateGenreDto;
+import com.windry.chordplayer.dto.genre.CreateGenreDto;
 import com.windry.chordplayer.exception.DuplicateGenreNameException;
 import com.windry.chordplayer.repository.GenreRepository;
 import org.junit.jupiter.api.Assertions;

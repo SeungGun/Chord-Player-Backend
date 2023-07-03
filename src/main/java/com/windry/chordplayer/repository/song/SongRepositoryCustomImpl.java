@@ -1,12 +1,12 @@
-package com.windry.chordplayer.repository;
+package com.windry.chordplayer.repository.song;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.windry.chordplayer.domain.*;
-import com.windry.chordplayer.dto.FiltersOfSongList;
-import com.windry.chordplayer.dto.SongListItemDto;
+import com.windry.chordplayer.dto.song.FiltersOfSongList;
+import com.windry.chordplayer.dto.song.SongListItemDto;
 import com.windry.chordplayer.spec.Gender;
 import com.windry.chordplayer.spec.SearchCriteria;
 import com.windry.chordplayer.spec.SortStrategy;
