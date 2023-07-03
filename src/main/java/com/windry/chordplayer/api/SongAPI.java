@@ -13,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,11 +26,13 @@ public class SongAPI {
     private final SongService songService;
 
     @PostMapping("")
-    public ResponseEntity<Long> createSongWithChords(
+    public ResponseEntity<Map<String, Long>> createSongWithChords(
             @RequestBody CreateSongDto createSongDto
     ) {
-        Long song = songService.createNewSong(createSongDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(song);
+        Long songId = songService.createNewSong(createSongDto);
+        Map<String, Long> result = new HashMap<>();
+        result.put("songId", songId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @GetMapping("")
