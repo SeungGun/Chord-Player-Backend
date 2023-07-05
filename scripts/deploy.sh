@@ -33,4 +33,4 @@ echo $database_url
 echo $database_username
 echo $database_password
 
-nohup java -jar -Dspring.profiles.active=$profile $REPOSITORY/$JAR_NAME /dev/null 2> /dev/null < /dev/null &
+nohup java -jar  $REPOSITORY/$JAR_NAME --spring.profiles.active=$profile --database_url=${database_url} --database_username=${database_username} --database_password=${database_password} &
