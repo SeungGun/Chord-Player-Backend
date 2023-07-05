@@ -54,10 +54,6 @@ jobs:
         run: ./gradlew build -P profile=${{ env.PROFILE }}
         shell: bash
         
-      - name: Make zip file
-        run: zip -r ./$GITHUB_SHA.zip .
-        shell: bash
-        
 #   deploy:
 #     needs: build
 #     runs-on: ubuntu-latest
