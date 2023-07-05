@@ -91,6 +91,7 @@ jobs:
         run: |
           aws deploy create-deployment \
             --application-name ${{ env.CODEDEPLOY_APPLICATION_NAME }} \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
             --deployment-group-name ${{ env.CODEDEPLOY_DEPLOYMENT_GROUP }} \
             --s3-location bucket=$AWS_S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
 #      - name: Deploy AWS Server
