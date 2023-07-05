@@ -65,7 +65,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 17
+          java-version: '17'
+          distribution: 'adopt'          
       
       - name: Install AWS CLI
         run: |
