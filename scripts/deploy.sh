@@ -25,4 +25,4 @@ JAR_NAME=$(ls $REPOSITORY/ | grep 'chord-player' | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
 
-nohup java -jar $REPOSITORY/$JAR_NAME &
+nohup java -jar -Dprofile=$profile -Ddatabase_url=$database_url -Ddatabase_username=$database_username -Ddatabase_password=$database_password $REPOSITORY/$JAR_NAME &
