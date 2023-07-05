@@ -25,12 +25,12 @@ JAR_NAME=$(ls $REPOSITORY/ | grep 'chord-player' | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
 
-chmod +x ~/.bashrc
-source ~/.bashrc
+chmod +x ~/.bash_profile
+source ~/.bash_profile
 
 echo $profile
 echo $database_url
 echo $database_username
 echo $database_password
 
-nohup java -jar $REPOSITORY/$JAR_NAME --spring.config.location=file:/home/ubuntu/app/src/main/resources/application.yml -Dprofile=$profile -Ddatabase.url=$database_url -Ddatabase.username=$database_username -Ddatabase.password=$database_password &
+nohup java -jar $REPOSITORY/$JAR_NAME -Dspring.profiles.active=$profile -Ddatabase.url=$database_url -Ddatabase.username=$database_username -Ddatabase.password=$database_password &
