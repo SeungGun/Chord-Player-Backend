@@ -25,4 +25,6 @@ JAR_NAME=$(ls $REPOSITORY/ | grep 'chord-player' | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
 
+source ~/.bashrc
+
 nohup java -jar $REPOSITORY/$JAR_NAME --spring.config.location=classpath:/application.yml --env profile=$profile &
