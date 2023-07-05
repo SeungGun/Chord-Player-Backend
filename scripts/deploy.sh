@@ -33,4 +33,4 @@ echo $database_url
 echo $database_username
 echo $database_password
 
-nohup java -jar $REPOSITORY/$JAR_NAME -Dspring.profiles.active=$profile -Ddatabase.url=$database_url -Ddatabase.username=$database_username -Ddatabase.password=$database_password &
+nohup java -jar $REPOSITORY/$JAR_NAME -Dspring.profiles.active=$profile -Dspring.datasource.url=$database_url -Dspring.datasource.username=$database_username -Dspring.datasource.password=$database_password &
