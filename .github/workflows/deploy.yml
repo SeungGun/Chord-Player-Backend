@@ -85,7 +85,7 @@ jobs:
             --application-name ${{ env.CODEDEPLOY_APPLICATION_NAME }} \
             --ignore-hidden-files \
             --s3-location s3://$AWS_S3_BUCKET_NAME/$GITHUB_SHA.zip \
-            --source .
+            --source build/libs/
             
       - name: Create CodeDeploy deployment
         run: |
