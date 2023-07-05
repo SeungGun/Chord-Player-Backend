@@ -17,6 +17,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   CODEDEPLOY_APPLICATION_NAME: ${{ secrets.CODEDEPLOY_APPLICATION_NAME }}
   CODEDEPLOY_DEPLOYMENT_GROUP: ${{ secrets.CODEDEPLOY_DEPLOYMENT_GROUP }}
+  PROFILE: ${{ secrets.PROFILE }}
 # workflow는 한개 이상의 job을 가지며, 각 job은 여러 step에 따라 단계를 나눌 수 있습니다.
 jobs:
   build:
@@ -34,13 +35,16 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
-          
+      
+      - name: Set Profile Environment
+        run: echo "PROFILE=${{ env.PROFILE }}" >> $GITHUB_ENV
+        
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
       
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build -P profile=${{ env.PROFILE }}
         shell: bash
         
   deploy:
