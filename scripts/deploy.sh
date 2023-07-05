@@ -1,31 +1,28 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 REPOSITORY=/home/ubuntu/app
-cd $REPOSITORY
 
-JAR_NAME= $(ls $REPOSITORY/build/libs/ | grep 'SNAPSHOT.jar' | tail -n 1)
-echo "> $JAR_NAME"
+echo "> 현재 구동중인 애플리케이션 PID 확인"
 
-JAR_PATH=$REPOSITORY/build/libs/$JAR_NAME
-echo "> $JAR_PATH"
+CURRENT_PID=$(pgrep -f chord-player)
 
-APP_LOG=$REPOSITORY/application.log
+echo "$CURRENT_PID"
 
-echo "> 현재 구동 중인 애플리케이션 PID 확인"
-
-CURRENT_PID=$(pgrep -fl java | grep $REPOSITORY/build/libs/ | awk '{print $1}')
-
-if [ -z "$CURRENT_PID" ] 
-then
-  echo "현재 구동 중인 애플리케이션이 없으므로 종료하지 않습니다."
+if [ -z $CURRENT_PID ]; then
+  echo "> 현재 구동중인 애플리케이션이 없으므로 종료하지 않습니다."
 else
   echo "> kill -15 $CURRENT_PID"
   kill -15 $CURRENT_PID
   sleep 5
 fi
 
-echo "> $JAR_PATH 실행"
+echo "> 새 애플리케이션 배포"
+echo "> Build 파일 복사"
 
-nohup java -jar $JAR_PATH > $APP_LOG 2>&1 &
+cp $REPOSITORY/build/libs/*.jar $REPOSITORY/jar/
 
-echo "> 애플리케이션 배포 완료"
+JAR_NAME=$(ls $REPOSITORY/jar/ | grep 'chord-player' | tail -n 1)
+
+echo "> JAR Name: $JAR_NAME"
+
+nohup java -jar $REPOSITORY/jar/$JAR_NAME &
