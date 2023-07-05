@@ -28,4 +28,9 @@ echo "> JAR Name: $JAR_NAME"
 chmod +x ~/.bashrc
 source ~/.bashrc
 
+echo $profile
+echo $database_url
+echo $database_username
+echo $database_password
+
 nohup java -jar $REPOSITORY/$JAR_NAME --spring.config.location=file:/home/ubuntu/app/src/main/resources/application.yml -Dprofile=$profile -Ddatabase.url=$database_url -Ddatabase.username=$database_username -Ddatabase.password=$database_password &
