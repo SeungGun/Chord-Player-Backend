@@ -25,4 +25,4 @@ JAR_NAME=$(ls $REPOSITORY/ | grep 'chord-player' | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
 
-nohup java -jar $REPOSITORY/$JAR_NAME --spring.profiles.active=$profile --database.url=$database_url --database.username=$database_username --database.password=$database_password &
+nohup java -jar $REPOSITORY/$JAR_NAME --spring.config.location=classpath:/application.yml --env profile=$profile &
