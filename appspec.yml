@@ -4,7 +4,7 @@ os: linux
 files:
   - source: /
     destination: /home/ubuntu/app
-#    overwrite: yes
+    overwrite: yes
 
 permissions:
   - objects: /
@@ -14,11 +14,11 @@ permissions:
     mode: 755
 
 hooks:
-#  AfterInstall:
-#    - location: scripts/stop.sh
-#      timeout: 60
-#      runas: ubuntu
+  AfterInstall:
+    - location: scripts/stop.sh
+      timeout: 60
+      runas: ubuntu
   ApplicationStart:
-    - location: scripts/deploy.sh
+    - location: scripts/start.sh
       timeout: 60
       runas: ubuntu
