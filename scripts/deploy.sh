@@ -19,10 +19,10 @@ fi
 echo "> 새 애플리케이션 배포"
 echo "> Build 파일 복사"
 
-cp $REPOSITORY/build/libs/*.jar $REPOSITORY/jar/
+cp $REPOSITORY/build/libs/*.jar $REPOSITORY/
 
-JAR_NAME=$(ls $REPOSITORY/jar/ | grep 'chord-player' | tail -n 1)
+JAR_NAME=$(ls $REPOSITORY/ | grep 'chord-player' | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
 
-nohup java -jar $REPOSITORY/jar/$JAR_NAME &
+nohup java -jar $REPOSITORY/$JAR_NAME &
