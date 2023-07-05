@@ -7,11 +7,10 @@ files:
     overwrite: yes
 
 permissions:
-  - objects: /
+  - objects: /home/ubuntu/app
     pattern: "**"
     owner: ubuntu
     group: ubuntu
-    mode: 755
 
 hooks:
   AfterInstall:
