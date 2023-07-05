@@ -33,4 +33,4 @@ echo "> JAR Name: $JAR_NAME"
 # echo $database_username
 # echo $database_password
 
-nohup java -jar  $REPOSITORY/$JAR_NAME --spring.profiles.active=prod &
+nohup java -jar --spring.config.location=file:/home/ubuntu/application-prod.yml --spring.profiles.active=prod $REPOSITORY/$JAR_NAME &
