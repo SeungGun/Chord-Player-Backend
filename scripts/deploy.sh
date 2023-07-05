@@ -25,12 +25,12 @@ JAR_NAME=$(ls $REPOSITORY/ | grep 'chord-player' | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
 
-chmod +x ~/.bash_profile
+# chmod +x ~/.bash_profile
 source ~/.bash_profile
 
 echo $profile
-echo $database_url
-echo $database_username
-echo $database_password
+# echo $database_url
+# echo $database_username
+# echo $database_password
 
-nohup java -jar  $REPOSITORY/$JAR_NAME --spring.profiles.active=$profile --database_url=${database_url} --database_username=${database_username} --database_password=${database_password} &
+nohup java -jar  $REPOSITORY/$JAR_NAME --spring.profiles.active=$profile &
