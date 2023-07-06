@@ -53,21 +53,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -P profile=${{ env.PROFILE }}
         shell: bash
-        
-#   deploy:
-#     needs: build
-#     runs-on: ubuntu-latest
-    
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v3
-      
-#       - name: Set up JDK
-#         uses: actions/setup-java@v2
-#         with:
-#           java-version: '17'
-#           distribution: 'adopt'          
-      
+
       - name: Install AWS CLI
         run: |
           sudo apt-get install -y python3-pip
@@ -94,10 +80,3 @@ jobs:
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --deployment-group-name ${{ env.CODEDEPLOY_DEPLOYMENT_GROUP }} \
             --s3-location bucket=$AWS_S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
-#      - name: Deploy AWS Server
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.AWS_SERVER_HOST }}
-#          username: ${{ secrets.AWS_SERVER_USERNAME }}
-#          key: ${{ secrets.AWS_SSH_KEY }}
-#

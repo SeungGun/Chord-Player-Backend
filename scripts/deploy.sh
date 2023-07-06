@@ -25,7 +25,6 @@ JAR_NAME=$(ls $REPOSITORY/ | grep 'chord-player' | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
 
-# chmod +x ~/.bash_profile
 source ~/.bash_profile
 
 echo $profile
