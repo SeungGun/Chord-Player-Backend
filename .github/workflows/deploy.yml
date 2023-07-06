@@ -18,9 +18,7 @@ env:
   CODEDEPLOY_APPLICATION_NAME: ${{ secrets.CODEDEPLOY_APPLICATION_NAME }}
   CODEDEPLOY_DEPLOYMENT_GROUP: ${{ secrets.CODEDEPLOY_DEPLOYMENT_GROUP }}
   PROFILE: ${{ secrets.PROFILE }}
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
-  DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+
 # workflow는 한개 이상의 job을 가지며, 각 job은 여러 step에 따라 단계를 나눌 수 있습니다.
 jobs:
   build:
@@ -42,9 +40,6 @@ jobs:
       - name: Set Profile Environment
         run: |
           echo "profile=${{ env.PROFILE }}" >> $GITHUB_ENV
-          echo "database_url=${{ env.DATABASE_URL }}" >> $GITHUB_ENV
-          echo "database_username=${{ env.DATABASE_USERNAME }}" >> $GITHUB_ENV
-          echo "database_password=${{ env.DATABASE_PASSWORD }}" >> $GITHUB_ENV
           
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
