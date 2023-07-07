@@ -16,6 +16,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
+    asciidoctorExtensions
     compileOnly {
         extendsFrom annotationProcessor
     }
@@ -26,7 +27,15 @@ repositories {
 }
 
 ext {
-    set('snippetsDir', file("build/generated-snippets"))
+    snippetsDir = file("build/generated-snippets")
+}
+
+bootJar {
+    dependsOn asciidoctor
+    copy {
+        from "${asciidoctor.outputDir}"
+        into 'BOOT-INF/classes/static/docs'
+    }
 }
 
 dependencies {
@@ -38,7 +47,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 
+    implementation 'com.h2database:h2:'
     // QueryDsl
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
@@ -61,6 +72,28 @@ clean {
     delete file(generated)
 }
 
+asciidoctor {
+    dependsOn test
+    configurations 'asciidoctorExtensions'
+    inputs.dir snippetsDir
+
+    sources {
+        include("**/index.adoc", "**/common/*.adoc")
+    }
+
+    baseDirFollowsSourceFile()
+}
+
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
+task copyDocument(type: Copy) {
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
 tasks.named('test') {
     outputs.dir snippetsDir
     useJUnitPlatform()
@@ -69,4 +102,12 @@ tasks.named('test') {
 tasks.named('asciidoctor') {
     inputs.dir snippetsDir
     dependsOn test
+}
+
+build {
+    dependsOn copyDocument
+}
+
+jar {
+    enabled = false
 }

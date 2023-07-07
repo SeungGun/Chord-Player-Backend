@@ -1,0 +1,77 @@
+# workflow의 이름
+name: ci-cd-workflow
+
+# 해당 workflow가 언제 실행될 것인지에 대한 트리거를 지정
+on:
+  # main branch에 대한 push 나 pull request 이벤트를 트리거로 지정
+  push:
+    branches: [ main ]
+
+  # 수동으로 해당 workflow 실행 지정
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ap-northeast-2
+  AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  CODEDEPLOY_APPLICATION_NAME: ${{ secrets.CODEDEPLOY_APPLICATION_NAME }}
+  CODEDEPLOY_DEPLOYMENT_GROUP: ${{ secrets.CODEDEPLOY_DEPLOYMENT_GROUP }}
+  PROFILE: ${{ secrets.PROFILE }}
+
+# workflow는 한개 이상의 job을 가지며, 각 job은 여러 step에 따라 단계를 나눌 수 있습니다.
+jobs:
+  build:
+    # 해당 workflow를 어떤 OS 환경에서 실행할 것인지 지정
+    runs-on: ubuntu-latest
+
+    # step은 작업의 일부로 실행될 일련의 작업을 나타냅니다.
+    steps:
+      # 작업에서 액세스할 수 있도록 $GITHUB_WORKSPACE에서 저장소를 체크아웃합니다.
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      
+      - name: Set Profile Environment
+        run: |
+          echo "profile=${{ env.PROFILE }}" >> $GITHUB_ENV
+          
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+        shell: bash
+      
+      - name: Build with Gradle
+        run: ./gradlew build -P profile=${{ env.PROFILE }}
+        shell: bash
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get install -y python3-pip
+          sudo pip3 install awscli
+        
+      - name: Configure AWS credentials
+        run: |
+          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws configure set region ${{ env.AWS_REGION }}
+          
+      - name: Upload to AWS S3
+        run: |
+          aws deploy push \
+            --application-name ${{ env.CODEDEPLOY_APPLICATION_NAME }} \
+            --ignore-hidden-files \
+            --s3-location s3://$AWS_S3_BUCKET_NAME/$GITHUB_SHA.zip \
+            --source .
+            
+      - name: Create CodeDeploy deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ env.CODEDEPLOY_APPLICATION_NAME }} \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --deployment-group-name ${{ env.CODEDEPLOY_DEPLOYMENT_GROUP }} \
+            --s3-location bucket=$AWS_S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
