@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,11 +48,9 @@ public class Song extends BaseEntity {
     private String note;
 
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<SongGenre> songGenres = new ArrayList<>();
 
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Lyrics> lyricsList = new ArrayList<>();
 
     @Builder
@@ -68,39 +64,47 @@ public class Song extends BaseEntity {
         this.note = note;
     }
 
-    public void changeRequestFields(String title, String artist, String originalKey, Gender gender, Integer bpm, String modulation, List<Lyrics> lyrics, List<SongGenre> songGenres) {
+    public void changeRequestFields(String title, String artist, String originalKey, Gender gender, Integer bpm, String modulation, String note) {
         this.title = title;
         this.artist = artist;
         this.originalKey = originalKey;
         this.gender = gender;
         this.bpm = bpm;
         this.modulation = modulation;
+        this.note = note;
+    }
 
-        if (lyrics != null) {
+    public void updateLyrics(List<Lyrics> newLyrics) {
+        if (newLyrics != null) {
             // 가사 업데이트
             for (int i = 0; i < this.lyricsList.size(); ++i) {
-                if (i < lyrics.size()) {
+                if (i < newLyrics.size()) {
                     Lyrics exist = this.lyricsList.get(i);
-                    Lyrics updated = lyrics.get(i);
-                    exist.updateLyrics(updated.getTag(), updated.getLyrics(), updated.getChords());
+                    Lyrics updated = newLyrics.get(i);
+
+                    exist.updateTag(updated.getTag());
+                    exist.updateLyrics(updated.getLyrics());
+                    exist.updateChords(updated.getChords());
                 } else {
                     this.lyricsList.remove(i);
                     i--;
                 }
             }
 
-            for (int i = this.lyricsList.size(); i < lyrics.size(); ++i) {
-                Lyrics lyrics1 = lyrics.get(i);
+            for (int i = this.lyricsList.size(); i < newLyrics.size(); ++i) {
+                Lyrics lyrics1 = newLyrics.get(i);
                 this.lyricsList.add(lyrics1);
             }
         }
+    }
 
-        if (songGenres != null) {
+    public void updateGenres(List<SongGenre> newGenres) {
+        if (newGenres != null) {
             // 장르 업데이트
             for (int i = 0; i < this.songGenres.size(); ++i) {
-                if (i < songGenres.size()) {
+                if (i < newGenres.size()) {
                     SongGenre exist = this.songGenres.get(i);
-                    SongGenre updated = songGenres.get(i);
+                    SongGenre updated = newGenres.get(i);
                     exist.changeSongGenre(updated.getGenre());
                 } else {
                     this.songGenres.remove(i); // orphanRemoval 속성!!
@@ -108,8 +112,8 @@ public class Song extends BaseEntity {
                 }
             }
 
-            for (int i = this.songGenres.size(); i < songGenres.size(); ++i) {
-                SongGenre songGenre = songGenres.get(i);
+            for (int i = this.songGenres.size(); i < newGenres.size(); ++i) {
+                SongGenre songGenre = newGenres.get(i);
                 this.songGenres.add(songGenre);
             }
         }

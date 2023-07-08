@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +24,6 @@ public class Lyrics extends BaseEntity {
     private Song song;
 
     @OneToMany(mappedBy = "lyrics", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Chords> chords = new ArrayList<>();
 
     private String lyrics;
@@ -61,25 +58,30 @@ public class Lyrics extends BaseEntity {
         return chords.stream().map(Chords::getChord).toList();
     }
 
-    public void updateLyrics(Tag tag, String lyrics, List<Chords> chords) {
+    public void updateTag(Tag tag) {
         this.tag = tag;
-        this.lyrics = lyrics;
+    }
 
+    public void updateLyrics(String lyrics) {
+        this.lyrics = lyrics;
+    }
+
+    public void updateChords(List<Chords> newChords) {
         // 코드 업데이트
         for (int i = 0; i < this.chords.size(); ++i) {
-            if (i < chords.size()) {
-                Chords chords1 = this.chords.get(i);
-                Chords chords2 = chords.get(i);
-                chords1.updateChord(chords2.getChord());
+            if (i < newChords.size()) {
+                Chords existChord = this.chords.get(i);
+                Chords updatedChord = newChords.get(i);
+                existChord.updateChord(updatedChord.getChord());
             } else {
                 this.chords.remove(i);
                 i--;
             }
         }
 
-        for (int i = this.chords.size(); i < chords.size(); ++i) {
-            Chords chords1 = chords.get(i);
-            this.chords.add(chords1);
+        for (int i = this.chords.size(); i < newChords.size(); ++i) {
+            Chords newChord = newChords.get(i);
+            this.chords.add(newChord);
         }
     }
 }
