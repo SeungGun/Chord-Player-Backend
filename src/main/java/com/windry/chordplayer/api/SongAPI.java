@@ -37,7 +37,7 @@ public class SongAPI {
 
     @GetMapping("")
     public ResponseEntity<List<SongListItemDto>> getSongList(
-            @RequestParam(value = "page", defaultValue = "1") Long page,
+            @RequestParam(value = "page", defaultValue = "0") Long page,
             @RequestParam(value = "size", defaultValue = "10") Long size,
             @RequestParam(value = "searchCriteria", required = false) SearchCriteria searchCriteria,
             @RequestParam(value = "keyword", required = false) String keyword,
@@ -59,9 +59,7 @@ public class SongAPI {
                 .searchKey(key)
                 .build();
 
-        List<SongListItemDto> allSongs = songService.getAllSongs(filters, page, size);
-
-        return ResponseEntity.ok().body(allSongs);
+        return ResponseEntity.ok().body(songService.getAllSongs(filters, page, size));
     }
 
     @GetMapping("/{songId}")

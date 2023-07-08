@@ -66,8 +66,11 @@ class SongAPITest {
         List<SongGenre> genres = new ArrayList<>();
         genres.add(songGenre);
         song.changeRequestFields(
-                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null, genres
+                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null
         );
+        song.updateLyrics(null);
+        song.updateGenres(genres);
+
         songRepository.save(song);
 
         List<String> genreList = new ArrayList<>();
@@ -135,8 +138,11 @@ class SongAPITest {
         List<SongGenre> genres = new ArrayList<>();
         genres.add(songGenre);
         song.changeRequestFields(
-                "다정히 내 이름을 부르면", "경서예지", "Db", Gender.FEMALE, 72, null, null, genres
+                "다정히 내 이름을 부르면", "경서예지", "Db", Gender.FEMALE, 72, null, null
         );
+        song.updateLyrics(null);
+        song.updateGenres(genres);
+
         songRepository.save(song);
 
         List<String> genreList = new ArrayList<>();
@@ -293,8 +299,11 @@ class SongAPITest {
         List<SongGenre> genres = new ArrayList<>();
         genres.add(songGenre);
         song.changeRequestFields(
-                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null, genres
+                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null
         );
+        song.updateLyrics(null);
+        song.updateGenres(genres);
+
         Long id = songRepository.save(song).getId();
 
         MvcResult mvcResult = this.mockMvc.perform(get("/api/songs")
@@ -626,8 +635,11 @@ class SongAPITest {
         List<SongGenre> genres = new ArrayList<>();
         genres.add(songGenre);
         song.changeRequestFields(
-                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null, genres
+                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null
         );
+        song.updateLyrics(null);
+        song.updateGenres(genres);
+
         Long songId = songRepository.save(song).getId();
 
         List<String> genreList = new ArrayList<>();
@@ -668,8 +680,11 @@ class SongAPITest {
         List<SongGenre> genres = new ArrayList<>();
         genres.add(songGenre);
         song.changeRequestFields(
-                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null, genres
+                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null
         );
+        song.updateLyrics(null);
+        song.updateGenres(genres);
+
         Long songId = songRepository.save(song).getId();
         this.mockMvc.perform(delete("/api/songs/{songId}", songId))
                 .andExpect(status().isOk())
@@ -696,8 +711,11 @@ class SongAPITest {
         List<SongGenre> genres = new ArrayList<>();
         genres.add(songGenre);
         song.changeRequestFields(
-                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null, genres
+                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null
         );
+        song.updateLyrics(null);
+        song.updateGenres(genres);
+
         Long songId = songRepository.save(song).getId();
         this.mockMvc.perform(delete("/api/songs/" + (songId + 1)))
                 .andExpect(status().is4xxClientError());

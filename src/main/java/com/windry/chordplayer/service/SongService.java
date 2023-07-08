@@ -8,7 +8,6 @@ import com.windry.chordplayer.exception.DuplicateTitleAndArtistException;
 import com.windry.chordplayer.exception.ImpossibleConvertGenderException;
 import com.windry.chordplayer.exception.InvalidInputException;
 import com.windry.chordplayer.exception.NoSuchDataException;
-import com.windry.chordplayer.repository.ChordsRepository;
 import com.windry.chordplayer.repository.GenreRepository;
 import com.windry.chordplayer.repository.lyrics.LyricsRepository;
 import com.windry.chordplayer.repository.song.SongRepository;
@@ -29,7 +28,6 @@ public class SongService {
 
     private final SongRepository songRepository;
     private final LyricsRepository lyricsRepository;
-    private final ChordsRepository chordsRepository;
     private final GenreRepository genreRepository;
 
     @Transactional
@@ -80,10 +78,11 @@ public class SongService {
     }
 
     public List<SongListItemDto> getAllSongs(FiltersOfSongList filtersOfSongList, Long page, Long size) {
-        Optional<Song> optionalSong = songRepository.findById(page);
-        if (optionalSong.isEmpty())
-            throw new NoSuchDataException();
-        return songRepository.searchAllSong(filtersOfSongList, page, size, optionalSong.get());
+        Song currentSong = null;
+        if (page != null && page != 0) {
+            currentSong = songRepository.findById(page).orElseThrow(NoSuchDataException::new);
+        }
+        return songRepository.searchAllSong(filtersOfSongList, page, size, currentSong);
     }
 
     @Transactional
@@ -205,9 +204,10 @@ public class SongService {
                 createSongDto.getGender(),
                 createSongDto.getBpm(),
                 createSongDto.getModulation(),
-                lyricsList,
-                songGenres
+                createSongDto.getNote()
         );
+        song.updateLyrics(lyricsList);
+        song.updateGenres(songGenres);
     }
 
     @Transactional
