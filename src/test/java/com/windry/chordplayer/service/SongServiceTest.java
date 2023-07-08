@@ -76,8 +76,10 @@ class SongServiceTest {
                 songDto.getGender(),
                 songDto.getBpm(),
                 songDto.getModulation(),
-                null,
-                songGenres);
+                songDto.getNote()
+        );
+        song.updateLyrics(null);
+        song.updateGenres(songGenres);
 
         Song differentArtistSong = new Song();
 
@@ -88,9 +90,10 @@ class SongServiceTest {
                 songDto.getGender(),
                 songDto.getBpm(),
                 songDto.getModulation(),
-                null,
-                songGenres
+                songDto.getNote()
         );
+        differentArtistSong.updateLyrics(null);
+        differentArtistSong.updateGenres(songGenres);
 
         // when
         Song song1 = songRepository.save(song);
@@ -112,8 +115,10 @@ class SongServiceTest {
 
         Song song = new Song();
         song.changeRequestFields(
-                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null, null
+                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null
         );
+        song.updateLyrics(null);
+        song.updateGenres(null);
 
         List<String> genreList = new ArrayList<>();
         genreList.add("락");
@@ -350,8 +355,10 @@ class SongServiceTest {
 
         Song song = new Song();
         song.changeRequestFields(
-                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null, null
+                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null
         );
+        song.updateLyrics(null);
+        song.updateGenres(null);
 
         List<String> genreList = new ArrayList<>();
         genreList.add("락");
