@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Tuning {
     STANDARD("E A D G B E"),
-//    DROPPED_D("D A D G B E"),
+    //    DROPPED_D("D A D G B E"),
 //    OPEN_D("D A D F# A D"),
 //    MODAL_D("D A D G A D"),
 //    OPEN_G("D G D G B D"),
@@ -20,5 +20,13 @@ public enum Tuning {
     WHOLE_STEP("D G C F A D");
 
     private final String sequence;
+
+    public static Tuning findMatchedEnumFromString(String s) {
+        for (Tuning t : Tuning.values()) {
+            if (t.name().equalsIgnoreCase(s))
+                return t;
+        }
+        return null;
+    }
 
 }

@@ -39,22 +39,22 @@ public class SongAPI {
     public ResponseEntity<List<SongListItemDto>> getSongList(
             @RequestParam(value = "page", defaultValue = "0") Long page,
             @RequestParam(value = "size", defaultValue = "10") Long size,
-            @RequestParam(value = "searchCriteria", required = false) SearchCriteria searchCriteria,
+            @RequestParam(value = "searchCriteria", required = false) String searchCriteria,
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "gender", required = false) Gender gender,
+            @RequestParam(value = "gender", required = false) String gender,
             @RequestParam(value = "key", required = false) String key,
             @RequestParam(value = "genre", required = false) String genre,
-            @RequestParam(value = "sort", required = false) SortStrategy sortStrategy
+            @RequestParam(value = "sort", required = false) String sortStrategy
     ) {
 
         if (page == null || size == null)
             throw new InvalidInputException();
 
         FiltersOfSongList filters = FiltersOfSongList.builder()
-                .searchCriteria(searchCriteria)
+                .searchCriteria(SearchCriteria.findMatchedEnumFromString(searchCriteria))
                 .searchKeyword(keyword)
-                .gender(gender)
-                .sortStrategy(sortStrategy)
+                .gender(Gender.findMatchedEnumFromString(gender))
+                .sortStrategy(SortStrategy.findMatchedEnumFromString(sortStrategy))
                 .searchGenre(genre)
                 .searchKey(key)
                 .build();
@@ -66,7 +66,7 @@ public class SongAPI {
     public ResponseEntity<DetailSongDto> getFilteredSong(
             @PathVariable("songId") Long songId,
             @RequestParam(value = "capo", required = false) Integer capo,
-            @RequestParam(value = "tuning", required = false) Tuning tuning,
+            @RequestParam(value = "tuning", required = false) String tuning,
             @RequestParam(value = "gender", required = false) Boolean convertGender,
             @RequestParam(value = "key-up", required = false) Boolean isKeyUp,
             @RequestParam(value = "key", required = false) Integer key,
@@ -86,7 +86,7 @@ public class SongAPI {
 
         FiltersOfDetailSong filters = FiltersOfDetailSong.builder()
                 .capo(capo)
-                .tuning(tuning)
+                .tuning(Tuning.findMatchedEnumFromString(tuning))
                 .convertGender(convertGender)
                 .isKeyUp(isKeyUp)
                 .key(key)

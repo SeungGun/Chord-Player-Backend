@@ -366,6 +366,40 @@ class SongAPITest {
         ).andExpect(status().is4xxClientError()).andReturn();
     }
 
+    @DisplayName("노래 목록을 조회할 때, 선택 옵션에 대해 모두 null 값을 부여할 시, 필터링 없이 조회가 된다.")
+    @Test
+    void getSongListWithNoneFilter() throws Exception {
+
+        Genre genre = Genre.builder().name("락").build();
+        genreRepository.save(genre);
+
+        Song song = new Song();
+        SongGenre songGenre = SongGenre.builder()
+                .genre(genre)
+                .song(song)
+                .build();
+        List<SongGenre> genres = new ArrayList<>();
+        genres.add(songGenre);
+        song.changeRequestFields(
+                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null
+        );
+        song.updateLyrics(null);
+        song.updateGenres(genres);
+
+        Long id = songRepository.save(song).getId();
+
+        this.mockMvc.perform(get("/api/songs")
+                .param("page", "0")
+                .param("size", "10")
+                .param("searchCriteria", "null")
+                .param("keyword", (String) "null")
+                .param("gender", "null")
+                .param("key", "null")
+                .param("sort", "null")
+                .param("genre", "null")
+        ).andExpect(status().isOk());
+    }
+
     @DisplayName("상세 노래 조회에서 여러 키 변경 필터를 적용해본다.")
     @Test
     void getDetailSongWithKeyChange() throws Exception {
