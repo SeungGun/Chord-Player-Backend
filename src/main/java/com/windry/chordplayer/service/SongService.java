@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -221,17 +222,19 @@ public class SongService {
     }
 
     private String findNextModulationKey(String curKey, Song song, List<DetailLyricsDto> lyrics) {
-        for (DetailLyricsDto lyric : lyrics) {
-            if (lyric.getTag() != null && lyric.getTag().equals(Tag.MODULATION)) {
-                String[] split = song.getModulation().split("-");
-                for (int j = 0; j < split.length; ++j) {
-                    if (curKey.equals(split[j])) {
-                        return split[j + 1];
-                    }
-                }
-            }
-        }
-        return song.getOriginalKey();
+        Optional<String> result = lyrics.stream() // 주어진 리스트에 대해
+                .filter(lyric -> lyric.getTag() != null && lyric.getTag().equals(Tag.MODULATION)) // 아이템 중 필터링
+                .findFirst() // 그 중 처음에 찾은 것
+                .map(lyric -> { // 찾은 것을 새롭게 매핑
+                    String[] split = song.getModulation().split("-");
+                    return IntStream.range(0, split.length)
+                            .filter(index -> curKey.equals(split[index]))
+                            .mapToObj(index -> split[index + 1])
+                            .findFirst()
+                            .orElse(null);
+                });
+
+        return result.orElse(song.getOriginalKey());
     }
 
     public void validateDupSongAndArtist(String title, String artist) {
