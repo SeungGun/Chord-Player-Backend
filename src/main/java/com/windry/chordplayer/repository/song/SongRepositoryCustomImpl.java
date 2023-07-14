@@ -152,8 +152,11 @@ public class SongRepositoryCustomImpl implements SongRepositoryCustom {
      * @return 정렬 전략에 따른 현재 기준 데이터 다음의 데이터
      */
     private Predicate pagination(Song cursor, SortStrategy sortStrategy) {
-        if (cursor == null || sortStrategy == null)
+        if (cursor == null)
             return null;
+
+        if (sortStrategy == null)
+            return song.id.lt(cursor.getId());
 
         switch (sortStrategy) {
             case NAME -> song.title.loe(cursor.getTitle());
