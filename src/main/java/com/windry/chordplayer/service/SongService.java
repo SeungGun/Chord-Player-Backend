@@ -33,10 +33,10 @@ public class SongService {
 
     @Transactional
     public Long createNewSong(CreateSongDto createSongDto) {
-
         if (createSongDto == null)
             throw new InvalidInputException();
 
+        // 제목 & 가수 중복 검증
         validateDupSongAndArtist(createSongDto.getTitle(), createSongDto.getArtist());
 
         Song song = Song.builder()
@@ -49,38 +49,59 @@ public class SongService {
                 .bpm(createSongDto.getBpm())
                 .build();
 
-        for (int i = 0; i < createSongDto.getGenres().size(); ++i) {
-            Optional<Genre> genreOptional = genreRepository.findGenreByName(createSongDto.getGenres().get(i));
-            if (genreOptional.isPresent()) {
-                SongGenre songGenre = SongGenre.builder()
-                        .genre(genreOptional.get())
-                        .song(song).build();
-                song.addGenre(songGenre);
-            }
-        }
-        for (int i = 0; i < createSongDto.getContents().size(); i++) {
-            LyricsDto lyricsDto = createSongDto.getContents().get(i);
-            Lyrics lyrics = Lyrics.builder()
-                    .tag(Tag.findTagByString(lyricsDto.getTag()))
-                    .line(i + 1)
-                    .lyrics(lyricsDto.getLyrics())
-                    .build();
+        // 장르 데이터 검색해서 저장
+        createSongDto.getGenres().forEach(genre -> {
+            Optional<Genre> genreOptional = genreRepository.findGenreByName(genre);
 
-            for (String chord : lyricsDto.getChords()) {
-                Chords chords = Chords
-                        .builder()
-                        .chord(chord)
-                        .build();
-                lyrics.addChords(chords);
-            }
-            song.addLyrics(lyrics);
-        }
+            if (genreOptional.isPresent()) {
+                song.addGenre(SongGenre.builder()
+                        .genre(genreOptional.get())
+                        .song(song).build());
+            } else
+                throw new NoSuchDataException();
+        });
+
+        // 가사 및 코드 엔티티 생성
+        List<LyricsDto> contents = createSongDto.getContents();
+        IntStream.range(0, contents.size())
+                .forEach(index -> {
+                    // 가사 엔티티 객체 생성
+                    Lyrics lyrics = Lyrics.builder()
+                            .tag(Tag.findTagByString(contents.get(index).getTag()))
+                            .line(index + 1)
+                            .lyrics(contents.get(index).getLyrics())
+                            .build();
+                    // 코드 객체 생성 후, 가사 엔티티에 추가
+                    contents.get(index).getChords().forEach(chord ->
+                            lyrics.addChords(Chords.builder()
+                                    .chord(chord)
+                                    .build())
+                    );
+                    // 노래 엔티티에 최종 가사 엔티티 저장
+                    song.addLyrics(lyrics);
+                });
+
         return songRepository.save(song).getId();
     }
 
     public List<SongListItemDto> getAllSongs(FiltersOfSongList filtersOfSongList, Long page, Long size) {
+        if (size == null || size < 1)
+            throw new InvalidInputException();
+
+        if (filtersOfSongList.getSearchKeyword() != null && filtersOfSongList.getSearchKeyword().equals("null")) {
+            filtersOfSongList.setSearchKeyword(null);
+        }
+
+        if (filtersOfSongList.getSearchGenre() != null && filtersOfSongList.getSearchGenre().equals("null")) {
+            filtersOfSongList.setSearchGenre(null);
+        }
+
+        if (filtersOfSongList.getSearchKey() != null && filtersOfSongList.getSearchKey().equals("null")) {
+            filtersOfSongList.setSearchKey(null);
+        }
+
         Song currentSong = null;
-        if (page != null && page != 0) {
+        if (page != null && page >= 0 && page != 0) {
             currentSong = songRepository.findById(page).orElseThrow(NoSuchDataException::new);
         }
         return songRepository.searchAllSong(filtersOfSongList, page, size, currentSong);
@@ -176,28 +197,36 @@ public class SongService {
         Song song = optional.get();
 
         List<SongGenre> songGenres = new ArrayList<>();
-        for (int i = 0; i < createSongDto.getGenres().size(); ++i) {
-            Optional<Genre> genre = genreRepository.findGenreByName(createSongDto.getGenres().get(i));
+
+        // songGenre 엔티티 추가
+        createSongDto.getGenres().forEach(g -> {
+            Optional<Genre> genre = genreRepository.findGenreByName(g);
+
             if (genre.isPresent()) {
-                SongGenre songGenre = SongGenre.builder()
+                songGenres.add(SongGenre.builder()
                         .genre(genre.get())
                         .song(song)
-                        .build();
-                songGenres.add(songGenre);
-            }
-        }
+                        .build());
+            } else
+                throw new NoSuchDataException();
+        });
 
         List<Lyrics> lyricsList = new ArrayList<>();
-        for (int i = 0; i < createSongDto.getContents().size(); ++i) {
-            Lyrics lyrics = Lyrics.builder()
-                    .line(i + 1)
-                    .lyrics(createSongDto.getContents().get(i).getLyrics())
-                    .tag(Tag.findTagByString(createSongDto.getContents().get(i).getTag()))
-                    .build();
-            lyrics.changeAllChords(createSongDto.getContents().get(i).getChords());
-            lyricsList.add(lyrics);
-        }
 
+        // 새로 가사 및 코드 데이터 가져오고 가사 엔티티 생성
+        List<LyricsDto> contents = createSongDto.getContents();
+        IntStream.range(0, contents.size())
+                .forEach(index -> {
+                    Lyrics lyrics = Lyrics.builder()
+                            .line(index + 1)
+                            .lyrics(contents.get(index).getLyrics())
+                            .tag(Tag.findTagByString(contents.get(index).getTag()))
+                            .build();
+                    lyrics.changeAllChords(contents.get(index).getChords());
+                    lyricsList.add(lyrics);
+                });
+
+        // 필드 업데이트
         song.changeRequestFields(
                 createSongDto.getTitle(),
                 createSongDto.getArtist(),
@@ -248,10 +277,10 @@ public class SongService {
     }
 
     private void applyKeyChange(List<DetailLyricsDto> lyrics, int amount) {
-        for (DetailLyricsDto detailLyricsDto : lyrics) {
-            List<String> chords = new ArrayList<>(detailLyricsDto.getChords());
+        lyrics.forEach(detail -> {
+            List<String> chords = new ArrayList<>(detail.getChords());
             chords.replaceAll(originChord -> ChordUtil.changeKey(originChord, amount));
-            detailLyricsDto.setChords(chords);
-        }
+            detail.setChords(chords);
+        });
     }
 }

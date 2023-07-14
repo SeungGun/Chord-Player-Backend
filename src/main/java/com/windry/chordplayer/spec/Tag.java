@@ -2,6 +2,8 @@ package com.windry.chordplayer.spec;
 
 public enum Tag {
     INTRO,
+    VERSE,
+    CHORUS,
     INTERLUDE,
     MODULATION,
     BRIDGE,
@@ -12,6 +14,6 @@ public enum Tag {
             if (tag.name().equalsIgnoreCase(str))
                 return tag;
         }
-        return null;
+        return Tag.VERSE;
     }
 }

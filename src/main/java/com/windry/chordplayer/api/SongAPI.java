@@ -46,10 +46,6 @@ public class SongAPI {
             @RequestParam(value = "genre", required = false) String genre,
             @RequestParam(value = "sort", required = false) String sortStrategy
     ) {
-
-        if (page == null || size == null)
-            throw new InvalidInputException();
-
         FiltersOfSongList filters = FiltersOfSongList.builder()
                 .searchCriteria(SearchCriteria.findMatchedEnumFromString(searchCriteria))
                 .searchKeyword(keyword)
@@ -58,7 +54,6 @@ public class SongAPI {
                 .searchGenre(genre)
                 .searchKey(key)
                 .build();
-
         return ResponseEntity.ok().body(songService.getAllSongs(filters, page, size));
     }
 
