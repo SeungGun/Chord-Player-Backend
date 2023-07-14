@@ -307,7 +307,7 @@ class SongAPITest {
         Long id = songRepository.save(song).getId();
 
         MvcResult mvcResult = this.mockMvc.perform(get("/api/songs")
-                        .param("page", id.toString())
+                        .param("page", "0")
                         .param("size", "10")
                         .param("searchCriteria", "TITLE")
                         .param("keyword", "하늘")
@@ -388,21 +388,31 @@ class SongAPITest {
 
         Long id = songRepository.save(song).getId();
 
-        this.mockMvc.perform(get("/api/songs")
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/songs")
                 .param("page", "0")
                 .param("size", "10")
                 .param("searchCriteria", "null")
-                .param("keyword", (String) "null")
+                .param("keyword", "null")
                 .param("gender", "null")
                 .param("key", "null")
                 .param("sort", "null")
                 .param("genre", "null")
-        ).andExpect(status().isOk());
+        ).andExpect(status().isOk()).andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        String content = response.getContentAsString();
+
+        JSONArray jsonArray = new JSONArray(content);
+
+        assertTrue(jsonArray.length() > 0);
     }
 
     @DisplayName("상세 노래 조회에서 여러 키 변경 필터를 적용해본다.")
     @Test
     void getDetailSongWithKeyChange() throws Exception {
+        Genre genre = Genre.builder().name("락").build();
+        genreRepository.save(genre);
+
         List<String> genreList = new ArrayList<>();
         genreList.add("락");
 
@@ -499,6 +509,9 @@ class SongAPITest {
     @DisplayName("노래의 가사를 수정하면 성공적으로 수정이 되야한다.")
     @Test
     void modifySongForLyrics() throws Exception {
+        Genre genre = Genre.builder().name("발라드").build();
+        genreRepository.save(genre);
+
         List<String> genreList = new ArrayList<>();
         genreList.add("발라드");
 
