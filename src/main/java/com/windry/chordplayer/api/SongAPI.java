@@ -4,7 +4,6 @@ import com.windry.chordplayer.dto.song.*;
 import com.windry.chordplayer.spec.Gender;
 import com.windry.chordplayer.spec.SearchCriteria;
 import com.windry.chordplayer.spec.SortStrategy;
-import com.windry.chordplayer.exception.InvalidInputException;
 import com.windry.chordplayer.service.SongService;
 import com.windry.chordplayer.spec.Tuning;
 import lombok.RequiredArgsConstructor;
@@ -60,24 +59,15 @@ public class SongAPI {
     @GetMapping("/{songId}")
     public ResponseEntity<DetailSongDto> getFilteredSong(
             @PathVariable("songId") Long songId,
-            @RequestParam(value = "capo", required = false) Integer capo,
-            @RequestParam(value = "tuning", required = false) String tuning,
-            @RequestParam(value = "gender", required = false) Boolean convertGender,
-            @RequestParam(value = "key-up", required = false) Boolean isKeyUp,
-            @RequestParam(value = "key", required = false) Integer key,
-            @RequestParam(value = "currentKey") String currentKey,
-            @RequestParam(value = "offset", defaultValue = "0") Long offset, // line 에 대한 offset
-            @RequestParam(value = "size", defaultValue = "20") Long size
+            @RequestParam(value = "offset", defaultValue = "0") Long offset, // 마디에 대한 offset
+            @RequestParam(value = "size", defaultValue = "20") Long size, // 가져올 마디의 개수
+            @RequestParam(value = "currentKey") String currentKey, // 현재 마디의 키 값
+            @RequestParam(value = "capo", required = false) Integer capo, // 기타 카포 적용할 프렛
+            @RequestParam(value = "tuning", required = false) String tuning, // 기타 튜닝 방식
+            @RequestParam(value = "gender", required = false) Boolean convertGender, // 성별 변경할지 여부
+            @RequestParam(value = "key-up", required = false) Boolean isKeyUp, // 키를 높일지 여부
+            @RequestParam(value = "key", required = false) Integer key // 변경할 키 값
     ) {
-
-        if (songId == null)
-            throw new InvalidInputException();
-
-        if (offset == null || size == null)
-            throw new InvalidInputException();
-
-        if (currentKey == null)
-            throw new InvalidInputException();
 
         FiltersOfDetailSong filters = FiltersOfDetailSong.builder()
                 .capo(capo)
@@ -87,8 +77,7 @@ public class SongAPI {
                 .key(key)
                 .build();
 
-        DetailSongDto detailSong = songService.getDetailSong(songId, offset, size, filters, currentKey);
-        return ResponseEntity.ok().body(detailSong);
+        return ResponseEntity.ok().body(songService.getDetailSong(songId, offset, size, filters, currentKey));
     }
 
     @PutMapping("/{songId}")
