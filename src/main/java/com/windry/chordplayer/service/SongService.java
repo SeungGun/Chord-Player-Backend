@@ -88,18 +88,6 @@ public class SongService {
         if (size == null || size < 1)
             throw new InvalidInputException();
 
-        if (filtersOfSongList.getSearchKeyword() != null && filtersOfSongList.getSearchKeyword().equals("null")) {
-            filtersOfSongList.setSearchKeyword(null);
-        }
-
-        if (filtersOfSongList.getSearchGenre() != null && filtersOfSongList.getSearchGenre().equals("null")) {
-            filtersOfSongList.setSearchGenre(null);
-        }
-
-        if (filtersOfSongList.getSearchKey() != null && filtersOfSongList.getSearchKey().equals("null")) {
-            filtersOfSongList.setSearchKey(null);
-        }
-
         Song currentSong = null;
         if (page != null && page >= 0 && page != 0) {
             currentSong = songRepository.findById(page).orElseThrow(NoSuchDataException::new);
@@ -114,10 +102,16 @@ public class SongService {
         if (optional.isEmpty())
             throw new NoSuchDataException();
 
+        if (size == null || size < 1)
+            throw new InvalidInputException();
+
+        if (curKey == null)
+            throw new InvalidInputException();
+
         Song song = optional.get();
 
-        int cumulateKey = 0;
-        String currentKey;
+        int cumulateKey = 0; // 최종 키 변경 적용에 대한 변경할 누적 키 값
+        String currentKey; // 키 변경 적용에 대한 최종 키
         Gender currentGender = song.getGender();
 
         List<DetailLyricsDto> lyrics = lyricsRepository.getPagingLyricsBySong(offset, size, songId);
@@ -137,7 +131,7 @@ public class SongService {
         }
 
         // 남/여 키 변경 -> ±5
-        if (filtersOfDetailSong.getConvertGender() != null) {
+        if (filtersOfDetailSong.getConvertGender() != null && filtersOfDetailSong.getConvertGender()) {
             if (!optional.get().getGender().equals(Gender.MIXED)) {
                 int amount = 0;
                 if (optional.get().getGender().equals(Gender.MALE)) {

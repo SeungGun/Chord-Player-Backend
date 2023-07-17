@@ -44,6 +44,6 @@ public class LyricsRepositoryCustomImpl implements LyricsRepositoryCustom {
         if (offset == null || offset == 0L) {
             return null;
         }
-        return lyrics1.id.gt(offset);
+        return lyrics1.line.gt(offset);
     }
 }
