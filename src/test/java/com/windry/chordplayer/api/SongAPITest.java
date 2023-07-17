@@ -17,6 +17,7 @@ import com.windry.chordplayer.spec.SortStrategy;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,16 +25,22 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
@@ -44,6 +51,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 @Transactional
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class SongAPITest {
 
     @Autowired
@@ -64,9 +72,11 @@ class SongAPITest {
     private StringNullConverters.StringAsNullConverter stringAsNullConverter;
     @Autowired
     private SongAPI songAPI;
+    @Autowired
+    private GlobalExceptionHandler globalExceptionHandler;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp(RestDocumentationContextProvider restDocumentation) {
         FormattingConversionService formattingConversionService = new FormattingConversionService();
         formattingConversionService.addConverter(booleanAsNullConverter);
         formattingConversionService.addConverter(integerAsNullConverter);
@@ -75,8 +85,13 @@ class SongAPITest {
 
         // Conversion 서비스에 커스텀 컨버터를 등록한 뒤, MockMvc 설정에 추가
         // 추가를 안해주면 MockMvc에는 자동으로 커스텀 컨버터가 적용이 안됨..
+        /*
+            이렇게 직접 set up을 해주면 auto configuration이 무시되는 듯하다. 그래서 controller advice, rest docs 등 수동 설정이 필요
+         */
         this.mockMvc = MockMvcBuilders.standaloneSetup(songAPI)
-                .setConversionService(formattingConversionService) // Add it to mockito
+                .setControllerAdvice(globalExceptionHandler) // controller advice 추가
+                .apply(documentationConfiguration(restDocumentation)) // rest docs config 추가
+                .setConversionService(formattingConversionService) // 컨버터 추가
                 .build();
     }
 
