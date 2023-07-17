@@ -3,6 +3,7 @@ package com.windry.chordplayer.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.windry.chordplayer.api.converter.StringNullConverters;
 import com.windry.chordplayer.domain.Genre;
 import com.windry.chordplayer.domain.Song;
 import com.windry.chordplayer.domain.SongGenre;
@@ -20,10 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -51,6 +54,31 @@ class SongAPITest {
     private SongRepository songRepository;
     @Autowired
     private GenreRepository genreRepository;
+    @Autowired
+    private StringNullConverters.BooleanAsNullConverter booleanAsNullConverter;
+    @Autowired
+    private StringNullConverters.IntegerAsNullConverter integerAsNullConverter;
+    @Autowired
+    private StringNullConverters.LongAsNullConverter longAsNullConverter;
+    @Autowired
+    private StringNullConverters.StringAsNullConverter stringAsNullConverter;
+    @Autowired
+    private SongAPI songAPI;
+
+    @BeforeEach
+    public void setUp() {
+        FormattingConversionService formattingConversionService = new FormattingConversionService();
+        formattingConversionService.addConverter(booleanAsNullConverter);
+        formattingConversionService.addConverter(integerAsNullConverter);
+        formattingConversionService.addConverter(longAsNullConverter);
+        formattingConversionService.addConverter(stringAsNullConverter);
+
+        // Conversion 서비스에 커스텀 컨버터를 등록한 뒤, MockMvc 설정에 추가
+        // 추가를 안해주면 MockMvc에는 자동으로 커스텀 컨버터가 적용이 안됨..
+        this.mockMvc = MockMvcBuilders.standaloneSetup(songAPI)
+                .setConversionService(formattingConversionService) // Add it to mockito
+                .build();
+    }
 
     @DisplayName("이미 존재하는 제목과 가수의 노래를 생성할 때, 예외를 발생한다.")
     @Test
@@ -504,6 +532,106 @@ class SongAPITest {
 
         JSONObject jsonObject2 = new JSONObject(result.getResponse().getContentAsString());
         Assertions.assertEquals("F#", jsonObject2.optJSONArray("contents").getJSONObject(0).getJSONArray("chords").get(0));
+    }
+
+    @DisplayName("상세 노래 조회에서 가사의 페이징이 마디 별로 조회되어야한다.")
+    @Test
+    void getDetailSongInPaging() throws Exception {
+        Genre genre = Genre.builder().name("락").build();
+        genreRepository.save(genre);
+
+        List<String> genreList = new ArrayList<>();
+        genreList.add("락");
+
+        CreateSongDto dto = CreateSongDto.builder()
+                .title("하늘을 달리다")
+                .artist("허각")
+                .originalKey("E")
+                .bpm(116)
+                .gender(Gender.MALE)
+                .modulation(null)
+                .contents(null)
+                .genres(genreList)
+                .build();
+        List<LyricsDto> lyricsDtoList = new ArrayList<>();
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("B", "A"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("E", "A"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("B", "A"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag(null)
+                .lyrics("두근거렸지 난 결국")
+                .chords(LyricsDto.getAllChords("E", "Aadd2"))
+                .build());
+        dto.setContents(lyricsDtoList);
+
+        objectMapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+
+        ObjectWriter objectWriter = objectMapper.writer().withDefaultPrettyPrinter();
+        String json = objectWriter.writeValueAsString(dto);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/songs")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated()).andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        JSONObject jsonObject = new JSONObject(response.getContentAsString());
+
+        Long songId = jsonObject.optLong("songId");
+
+        /*
+            첫번째 페이징
+         */
+        MvcResult result = this.mockMvc.perform(get("/api/songs/{songId}", songId)
+                        .param("currentKey", "E")
+                        .param("gender", "null")
+                        .param("key-up", "null")
+                        .param("key", "null")
+                        .param("capo", "null")
+                        .param("offset", "0")
+                        .param("size", "3")
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        JSONObject firstJson = new JSONObject(result.getResponse().getContentAsString());
+        JSONArray firstArray = firstJson.optJSONArray("contents");
+        Assertions.assertEquals(3, firstArray.length());
+        // 가져온 리스트 중 마지막 마디의 첫번째 코드 값 비교
+        Assertions.assertEquals("B", firstArray.optJSONObject(firstArray.length() - 1).getJSONArray("chords").get(0));
+
+
+        /*
+            두번째 페이징
+         */
+        MvcResult result2 = this.mockMvc.perform(get("/api/songs/{songId}", songId)
+                        .param("currentKey", "E")
+                        .param("gender", "false")
+                        .param("key-up", "true")
+                        .param("key", "1")
+                        .param("capo", "0")
+                        .param("offset", firstArray.optJSONObject(firstArray.length() - 1).optString("line")) // 마지막으로 가져온 마디 값을 다음 요청의 offset 으로 설정
+                        .param("size", "3")
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        JSONObject secondJson = new JSONObject(result2.getResponse().getContentAsString());
+        JSONArray secondArray = secondJson.optJSONArray("contents");
+        // 가져온 리스트 중 마지막 마디의 두번째 코드 값이 키업이 되었는지 비교
+        Assertions.assertEquals("A#add2", secondArray.optJSONObject(secondArray.length() - 1).getJSONArray("chords").get(1));
     }
 
     @DisplayName("노래의 가사를 수정하면 성공적으로 수정이 되야한다.")
