@@ -4,10 +4,7 @@ import com.windry.chordplayer.domain.*;
 import com.windry.chordplayer.dto.lyrics.DetailLyricsDto;
 import com.windry.chordplayer.dto.lyrics.LyricsDto;
 import com.windry.chordplayer.dto.song.*;
-import com.windry.chordplayer.exception.DuplicateTitleAndArtistException;
-import com.windry.chordplayer.exception.ImpossibleConvertGenderException;
-import com.windry.chordplayer.exception.InvalidInputException;
-import com.windry.chordplayer.exception.NoSuchDataException;
+import com.windry.chordplayer.exception.*;
 import com.windry.chordplayer.repository.GenreRepository;
 import com.windry.chordplayer.repository.lyrics.LyricsRepository;
 import com.windry.chordplayer.repository.song.SongRepository;
@@ -21,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 @Service
@@ -38,6 +37,10 @@ public class SongService {
 
         // 제목 & 가수 중복 검증
         validateDupSongAndArtist(createSongDto.getTitle(), createSongDto.getArtist());
+
+        // 유효한 키인지 검증
+        if (isInvalidKey(createSongDto.getOriginalKey()))
+            throw new InvalidKeyException();
 
         Song song = Song.builder()
                 .title(createSongDto.getTitle())
@@ -107,6 +110,10 @@ public class SongService {
 
         if (curKey == null)
             throw new InvalidInputException();
+
+        // 현재 키가 올바르지 않은지 검증
+        if (isInvalidKey(curKey))
+            throw new InvalidKeyException();
 
         Song song = optional.get();
 
@@ -189,6 +196,16 @@ public class SongService {
             throw new InvalidInputException();
 
         Song song = optional.get();
+
+        // 제목 & 가수 중복 검증
+        if (!(song.getTitle().equals(createSongDto.getTitle())
+                && song.getArtist().equals(createSongDto.getArtist())))
+            validateDupSongAndArtist(createSongDto.getTitle(), createSongDto.getArtist());
+
+        // 유효한 키인지 검증
+        if (isInvalidKey(createSongDto.getOriginalKey()))
+            throw new InvalidKeyException();
+
 
         List<SongGenre> songGenres = new ArrayList<>();
 
@@ -276,5 +293,11 @@ public class SongService {
             chords.replaceAll(originChord -> ChordUtil.changeKey(originChord, amount));
             detail.setChords(chords);
         });
+    }
+
+    private boolean isInvalidKey(String currentKey) {
+        Pattern pattern = Pattern.compile("^[A-G]([#b]?)(m)?$");
+        Matcher matcher = pattern.matcher(currentKey);
+        return !matcher.matches();
     }
 }
