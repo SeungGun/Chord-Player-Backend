@@ -38,12 +38,12 @@ public class SongAPI {
     public ResponseEntity<List<SongListItemDto>> getSongList(
             @RequestParam(value = "page", defaultValue = "0") Long page,
             @RequestParam(value = "size", defaultValue = "10") Long size,
-            @RequestParam(value = "searchCriteria", required = false) String searchCriteria,
-            @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "gender", required = false) String gender,
-            @RequestParam(value = "key", required = false) String key,
-            @RequestParam(value = "genre", required = false) String genre,
-            @RequestParam(value = "sort", required = false) String sortStrategy
+            @RequestParam(value = "searchCriteria", required = false) String searchCriteria, // 검색 기준
+            @RequestParam(value = "keyword", required = false) String keyword, // 검색어
+            @RequestParam(value = "gender", required = false) String gender, // 필터링할 성별
+            @RequestParam(value = "key", required = false) String key, // 필터링할 키
+            @RequestParam(value = "genre", required = false) String genre, // 필터링할 장르
+            @RequestParam(value = "sort", required = false) String sortStrategy // 정렬 기준
     ) {
         FiltersOfSongList filters = FiltersOfSongList.builder()
                 .searchCriteria(SearchCriteria.findMatchedEnumFromString(searchCriteria))
@@ -68,7 +68,6 @@ public class SongAPI {
             @RequestParam(value = "key-up", required = false) Boolean isKeyUp, // 키를 높일지 여부
             @RequestParam(value = "key", required = false) Integer key // 변경할 키 값
     ) {
-
         FiltersOfDetailSong filters = FiltersOfDetailSong.builder()
                 .capo(capo)
                 .tuning(Tuning.findMatchedEnumFromString(tuning))
@@ -76,7 +75,6 @@ public class SongAPI {
                 .isKeyUp(isKeyUp)
                 .key(key)
                 .build();
-
         return ResponseEntity.ok().body(songService.getDetailSong(songId, offset, size, filters, currentKey));
     }
 
