@@ -285,6 +285,50 @@ class SongAPITest {
                 ));
     }
 
+    @DisplayName("노래 생성 시, contents의 코드가 유효한 루트 코드가 아니면 예외를 발생한다.")
+    @Test
+    void createSongWithInvalidChord() throws Exception {
+        Genre genre = Genre.builder().name("락").build();
+        genreRepository.save(genre);
+
+        List<String> genreList = new ArrayList<>();
+        genreList.add("락");
+
+        CreateSongDto dto = CreateSongDto.builder()
+                .title("하늘을 달리다")
+                .artist("이적")
+                .originalKey("E")
+                .bpm(116)
+                .gender(Gender.MALE)
+                .modulation(null)
+                .contents(null)
+                .genres(genreList)
+                .build();
+        List<LyricsDto> lyricsDtoList = new ArrayList<>();
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("XYZ", "PLAO"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("E", "A"))
+                .build());
+        dto.setContents(lyricsDtoList);
+
+        objectMapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+
+        ObjectWriter objectWriter = objectMapper.writer().withDefaultPrettyPrinter();
+        String json = objectWriter.writeValueAsString(dto);
+
+        this.mockMvc.perform(post("/api/songs")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+    }
+
     @DisplayName("노래 목록을 조회할 때, 모든 필터를 적용해본다. ")
     @Test
     public void getSongListWithAllFilters() throws Exception {
@@ -871,6 +915,63 @@ class SongAPITest {
                 .contents(null)
                 .genres(genreList)
                 .build();
+
+        objectMapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+
+        ObjectWriter objectWriter = objectMapper.writer().withDefaultPrettyPrinter();
+        String modifyJson = objectWriter.writeValueAsString(dto);
+        this.mockMvc.perform(put("/api/songs/" + (songId + 1))
+                        .content(modifyJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @DisplayName("유효하지 않은 루트코드에 대해 수정을 시도하는 경우 예외가 발생한다.")
+    @Test
+    void modifySongInvalidChord() throws Exception {
+        Genre genre = Genre.builder().name("락").build();
+        genreRepository.save(genre);
+
+        Song song = new Song();
+        SongGenre songGenre = SongGenre.builder()
+                .genre(genre)
+                .song(song)
+                .build();
+        List<SongGenre> genres = new ArrayList<>();
+        genres.add(songGenre);
+        song.changeRequestFields(
+                "하늘을 달리다", "이적", "E", Gender.MALE, 116, null, null
+        );
+        song.updateLyrics(null);
+        song.updateGenres(genres);
+
+        Long songId = songRepository.save(song).getId();
+
+        List<String> genreList = new ArrayList<>();
+        genreList.add("락");
+
+        CreateSongDto dto = CreateSongDto.builder()
+                .title("달렸다 하늘을")
+                .artist("각허")
+                .originalKey("E")
+                .bpm(116)
+                .gender(Gender.MALE)
+                .modulation(null)
+                .contents(null)
+                .genres(genreList)
+                .build();
+        List<LyricsDto> lyricsDtoList = new ArrayList<>();
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("XYZ", "PLAO"))
+                .build());
+        lyricsDtoList.add(LyricsDto.builder()
+                .tag("INTRO")
+                .lyrics(null)
+                .chords(LyricsDto.getAllChords("KK", "INC"))
+                .build());
+        dto.setContents(lyricsDtoList);
 
         objectMapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 
