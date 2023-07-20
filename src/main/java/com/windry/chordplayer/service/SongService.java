@@ -75,10 +75,14 @@ public class SongService {
                             .lyrics(contents.get(index).getLyrics())
                             .build();
                     // 코드 객체 생성 후, 가사 엔티티에 추가
-                    contents.get(index).getChords().forEach(chord ->
-                            lyrics.addChords(Chords.builder()
-                                    .chord(chord)
-                                    .build())
+                    contents.get(index).getChords().forEach(chord -> {
+                                // 원본 코드를 추출할 수 있는 정상적인 코드인 경우 추가 (그렇지 않으면 exception 발생)
+                                if (!ChordUtil.extractBaseChord(chord).isEmpty()) {
+                                    lyrics.addChords(Chords.builder()
+                                            .chord(chord)
+                                            .build());
+                                }
+                            }
                     );
                     // 노래 엔티티에 최종 가사 엔티티 저장
                     song.addLyrics(lyrics);
@@ -206,7 +210,6 @@ public class SongService {
         if (isInvalidKey(createSongDto.getOriginalKey()))
             throw new InvalidKeyException();
 
-
         List<SongGenre> songGenres = new ArrayList<>();
 
         // songGenre 엔티티 추가
@@ -233,7 +236,17 @@ public class SongService {
                             .lyrics(contents.get(index).getLyrics())
                             .tag(Tag.findTagByString(contents.get(index).getTag()))
                             .build();
-                    lyrics.changeAllChords(contents.get(index).getChords());
+
+                    // 코드 객체 생성 후, 가사 엔티티에 추가
+                    contents.get(index).getChords().forEach(chord -> {
+                                // 원본 코드를 추출할 수 있는 정상적인 코드인 경우 추가 (그렇지 않으면 exception 발생)
+                                if (!ChordUtil.extractBaseChord(chord).isEmpty()) {
+                                    lyrics.addChords(Chords.builder()
+                                            .chord(chord)
+                                            .build());
+                                }
+                            }
+                    );
                     lyricsList.add(lyrics);
                 });
 
