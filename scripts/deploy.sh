@@ -27,7 +27,6 @@ echo "> JAR Name: $JAR_NAME"
 
 source ~/.bash_profile
 
-echo $profile
 echo $database_url
 echo $database_username
 echo $database_password
